@@ -1,4 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body{
+    height: 100%;
+}
+
 body{
-    margin: 1.2rem;
+    margin: 1.2rem !important;
     background-color: #333;
+}
+
+#root{
+    height: 100%;
 }
