@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import InfoSect from "./InfoSect";
 import MainPlayer from "./MainPlayer";
@@ -6,11 +6,16 @@ import PlaylistSect from "./PlaylistSect";
 
 const ITEM_TYPE = 'SECTION';
 
-// Define a type for sections
 interface Section {
   id: number;
-  component: React.ReactNode;
+  type: string;
 }
+
+const componentMap: Record<string, React.ReactNode> = {
+  playlist: <PlaylistSect />,
+  mainPlayer: <MainPlayer />,
+  info: <InfoSect />,
+};
 
 interface DraggableItemProps {
   id: number;
@@ -22,7 +27,6 @@ interface DraggableItemProps {
 const DraggableItem: React.FC<DraggableItemProps> = ({ id, index, moveItem, children }) => {
   const ref = React.useRef<HTMLDivElement>(null);
 
-  // Drag logic
   const [{ isDragging }, drag] = useDrag({
     type: ITEM_TYPE,
     item: { id, index },
@@ -31,7 +35,6 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ id, index, moveItem, chil
     }),
   });
 
-  // Drop logic
   const [, drop] = useDrop({
     accept: ITEM_TYPE,
     hover: (draggedItem: { id: number; index: number }) => {
@@ -67,11 +70,20 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ id, index, moveItem, chil
 };
 
 export default function Main(){
-  const [sections, setSections] = useState<Section[]>([
-    { id: 1, component: <PlaylistSect /> },
-    { id: 2, component: <MainPlayer /> },
-    { id: 3, component: <InfoSect /> },
-  ]);
+  const [sections, setSections] = useState<Section[]>(() => {
+    const storedSections = localStorage.getItem("sections");
+    return storedSections
+      ? JSON.parse(storedSections)
+      : [
+          { id: 1, type: "playlist" },
+          { id: 2, type: "mainPlayer" },
+          { id: 3, type: "info" },
+        ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("sections", JSON.stringify(sections));
+  }, [sections]);
 
   const moveItem = (fromIndex: number, toIndex: number): void => {
     const updatedSections = [...sections];
@@ -89,7 +101,7 @@ export default function Main(){
           index={index}
           moveItem={moveItem}
         >
-          {section.component}
+          {componentMap[section.type]}
         </DraggableItem>
       ))}
     </main>
