@@ -59,6 +59,14 @@ header {
     margin-left: 4.5rem;
 }
 
+.ml-1\/10{
+    margin-left: 10%;
+}
+
+.ml-f-1\/4{
+    margin-left: calc(75% / 2);
+}
+
 .btn:hover {
     background-color: #d5d5d5;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
