@@ -34,6 +34,10 @@ header {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
+.bg-333{
+    background-color: #333;
+}
+
 .btn {
     padding: 0.5rem 1rem;
     border: none;
@@ -44,6 +48,15 @@ header {
     cursor: pointer;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
+}
+
+.text-mute{
+    color: #555;
+    font-size: 10pt;
+}
+
+.ml-18{
+    margin-left: 4.5rem;
 }
 
 .btn:hover {
