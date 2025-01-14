@@ -118,6 +118,41 @@ main{
   }
   
   img.track {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
-    border-radius: 8px; /* Optional: add rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
   }
+
+  input[type="range"] {
+    -webkit-appearance: none; /* Remove default styles */
+    appearance: none;
+    width: 100%; /* Full width */
+    height: 1rem; /* Thickness of the line */
+    background: #ccc; /* Line color */
+    border-radius: 2px; /* Rounded edges */
+    outline: none; /* Remove outline */
+    cursor: pointer;
+    margin-bottom: calc(50% - 0.5rem);
+  }
+  
+  /* Style the thumb (the draggable circle) */
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; /* Remove default styles */
+    appearance: none;
+    width: 0; /* Hide the thumb */
+    height: 0; /* Hide the thumb */
+    background: transparent; /* Transparent thumb */
+  }
+  
+  /* For other browsers (Firefox, etc.) */
+  input[type="range"]::-moz-range-thumb {
+    width: 0; /* Hide the thumb */
+    height: 0; /* Hide the thumb */
+    background: transparent; /* Transparent thumb */
+  }
+  
+  input[type="range"]::-ms-thumb {
+    width: 0; /* Hide the thumb */
+    height: 0; /* Hide the thumb */
+    background: transparent; /* Transparent thumb */
+  }
+  

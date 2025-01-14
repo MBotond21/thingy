@@ -25,7 +25,6 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 return response.json();
             })
             .then((data) => {
-                console.log(data.results);
 
                 let t: Track = {
                     id: data.results[0].id,
