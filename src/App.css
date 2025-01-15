@@ -123,36 +123,33 @@ main{
   }
 
   input[type="range"] {
-    -webkit-appearance: none; /* Remove default styles */
+    -webkit-appearance: none;
     appearance: none;
-    width: 100%; /* Full width */
-    height: 1rem; /* Thickness of the line */
-    background: #ccc; /* Line color */
-    border-radius: 2px; /* Rounded edges */
-    outline: none; /* Remove outline */
+    width: 100%;
+    height: 1rem;
+    background: #ccc;
+    border-radius: 2px;
+    outline: none;
     cursor: pointer;
-    margin-bottom: calc(50% - 0.5rem);
   }
-  
-  /* Style the thumb (the draggable circle) */
+
   input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none; /* Remove default styles */
+    -webkit-appearance: none;
     appearance: none;
-    width: 0; /* Hide the thumb */
-    height: 0; /* Hide the thumb */
-    background: transparent; /* Transparent thumb */
+    width: 0;
+    height: 0;
+    background: transparent;
   }
   
-  /* For other browsers (Firefox, etc.) */
   input[type="range"]::-moz-range-thumb {
-    width: 0; /* Hide the thumb */
-    height: 0; /* Hide the thumb */
-    background: transparent; /* Transparent thumb */
+    width: 0;
+    height: 0;
+    background: transparent;
   }
   
   input[type="range"]::-ms-thumb {
-    width: 0; /* Hide the thumb */
-    height: 0; /* Hide the thumb */
-    background: transparent; /* Transparent thumb */
+    width: 0;
+    height: 0;
+    background: transparent;
   }
   

@@ -27,7 +27,7 @@ interface DraggableItemProps {
 const DraggableItem: React.FC<DraggableItemProps> = ({ id, index, moveItem, children }) => {
   const ref = React.useRef<HTMLDivElement>(null);
 
-  const [{ isDragging }, drag] = useDrag({
+  const [{ isDragging }, drag, dragHandle] = useDrag({
     type: ITEM_TYPE,
     item: { id, index },
     collect: (monitor) => ({
@@ -51,7 +51,6 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ id, index, moveItem, chil
 
   return (
     <div
-      ref={ref}
       style={{
         opacity: isDragging ? 0.5 : 1,
         cursor: 'grab',
@@ -64,6 +63,16 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ id, index, moveItem, chil
         boxSizing: 'border-box',
       }}
     >
+      <div
+        ref={ref}
+        style={{
+          backgroundColor: "lightblue",
+          padding: "5px",
+          cursor: "grab",
+        }}
+      >
+        Drag Handle
+      </div>
       {children}
     </div>
   );
