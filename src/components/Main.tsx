@@ -27,7 +27,7 @@ interface DraggableItemProps {
 const DraggableItem: React.FC<DraggableItemProps> = ({ id, index, moveItem, children }) => {
   const ref = React.useRef<HTMLDivElement>(null);
 
-  const [{ isDragging }, drag, dragHandle] = useDrag({
+  const [{ isDragging }, drag] = useDrag({
     type: ITEM_TYPE,
     item: { id, index },
     collect: (monitor) => ({
@@ -53,7 +53,6 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ id, index, moveItem, chil
     <div
       style={{
         opacity: isDragging ? 0.5 : 1,
-        cursor: 'grab',
         flex: '1',
         display: 'flex',
         height: '85%',
