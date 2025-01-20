@@ -5,8 +5,9 @@ export default function AccComp(){
 
     return<>
         <div className="acc">
-            <button className="btn" onClick={() => navigate("/signup")}>Signup</button>
-            <button className="btn" onClick={() => navigate("/login")}>Login</button>
+            <button className="btn hidden md:block" onClick={() => navigate("/signup")}>Signup</button>
+            <button className="btn hidden md:block" onClick={() => navigate("/login")}>Login</button>
+            <button className="btn md:hidden" onClick={() => navigate("/login")}>Menu</button>
         </div>
     </>
 }
