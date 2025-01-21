@@ -161,9 +161,9 @@ main{
     background: transparent;
   }
   
-@media screen and (max-width: 1300px){
-    .tsm{
+  @media screen and (max-width: 1280px) {
+    .tsm {
+        display: flex;
         flex-direction: column;
-        columns: 1;
     }
 }
