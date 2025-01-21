@@ -18,7 +18,7 @@ export default function MainPlayer() {
 
     useEffect(() => {
         //loadTrack("887211");
-        loadAlbum("116770")
+        loadAlbum("104336")
     }, []);
 
     useEffect(() =>{
@@ -50,7 +50,12 @@ export default function MainPlayer() {
 
     useEffect(() => {
         if(currentTime == duration){
-            setCurrentTrack(queue[queue.indexOf(currentTrack)+1]);
+            if(queue.indexOf(currentTrack) != queue.length-1){
+                setCurrentTrack(queue[queue.indexOf(currentTrack)+1]);
+            } else{
+                setCurrentTrack(queue[0]);
+            }
+            setCurrentTime(0);
         }
     }, [currentTime])
 
@@ -97,22 +102,43 @@ export default function MainPlayer() {
         }
     };
 
+    const handleStep = (n: number) => {
+
+        if(queue.indexOf(currentTrack) == 0 && n < 0){
+            audioRef.current?.pause();
+            setCurrentTime(0); 
+        }else if(queue.indexOf(currentTrack) == queue.length-1){
+            setCurrentTrack(queue[0]);
+        }else{
+            let temp = queue.indexOf(currentTrack ) + n;
+            setCurrentTrack(queue[temp]);
+        }
+        setCurrentTime(0);
+        
+    }
+
     return <>
         <div className="content">
             <img src={currentTrack?.image} alt="trackPic" className="hover:cursor-default track" />
             <p className="text-2xl mt-1 hover:cursor-default" ><b>{currentTrack?.artist_name}</b> - {currentTrack?.name}</p>
-            <div className="w-full m-4 relative top-1/4">
+            <div className="w-full m-4">
                 <audio ref={audioRef} className="w-3/4 ml-f-3/4 hover:cursor-default">
                     <source src={currentTrack?.audio} type="audio/mpeg" />
                 </audio>
                 <div className="w-3/4 ml-f-3/4 inline h-6">
-                    <div className="flex items-center justify-center">
+                    <div className="flex items-center justify-center gap-10">
+                        <button className="size-5" onClick={() => handleStep(-1)}>
+                            <FontAwesomeIcon icon={faBackwardStep} className="size-5" />
+                        </button>
                         <button id="play-pause" onClick={handlePlayClick} className="size-5">
                             {isPlaying ? (
                                 <FontAwesomeIcon icon={faPause} className="size-5" />
                             ) : (
                                 <FontAwesomeIcon icon={faPlay} className="size-5" />
                             )}
+                        </button>
+                        <button className="size-5" onClick={() => handleStep(1)}>
+                            <FontAwesomeIcon icon={faForwardStep} className="size-5" />
                         </button>
                     </div>
                     <div className="flex items-center justify-center gap-2">

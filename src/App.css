@@ -38,6 +38,16 @@ header {
     background-color: #333;
 }
 
+.bg-222{
+    background-color: #222;
+}
+
+.h-9\/10{
+    height: 90%;
+    max-height: 90%;
+    overflow: scroll;
+}
+
 .btn {
     padding: 0.5rem 1rem;
     border: none;
@@ -119,7 +129,6 @@ main{
   
   img.track {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
   }
 
   input[type="range"] {
@@ -153,3 +162,9 @@ main{
     background: transparent;
   }
   
+@media screen and (max-width: 1300px){
+    .tsm{
+        flex-direction: column;
+        columns: 1;
+    }
+}
