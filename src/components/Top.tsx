@@ -35,7 +35,7 @@ export default function Top(props: Props) {
     return <>
         <div className="w-full">
             <h1 className="text-3xl font-semibold mb-2" >{props.type.substring(0, 1).toUpperCase() + props.type.substring(1, props.type.length)}ly top {props.from}</h1>
-            <div className="flex flex-row gap-10">
+            <div className="flex flex-row gap-10 overflow-scroll">
                 {
                     dataMap[props.type.concat(props.from)].map((track) => (
                         <div className="flex flex-col">
