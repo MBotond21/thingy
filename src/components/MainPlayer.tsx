@@ -44,6 +44,9 @@ export default function MainPlayer() {
         audio.addEventListener("play", handlePlay);
         audio.addEventListener("pause", handlePause);
 
+        const vol = localStorage.getItem("volume");
+        if(vol) audio.volume = parseFloat(vol);
+
         return () => {
             audio.removeEventListener("timeupdate", updateProgress);
             audio.removeEventListener("loadedmetadata", updateProgress);
@@ -121,6 +124,7 @@ export default function MainPlayer() {
         if (audio) {
             audio.volume = parseFloat(e.target.value);
             setVolume(audio.volume);
+            localStorage.setItem("volume", volume.toString());
             e.target.style.background = `linear-gradient(to top, #FDDA0D 0%, #FDDA0D ${parseFloat(e.target.value) * 100}%, #ccc ${parseFloat(e.target.value) * 100}%)`;
         }
     };
@@ -141,6 +145,7 @@ export default function MainPlayer() {
         if (queue.indexOf(currentTrack!) == 0 && n < 0) {
             audioRef.current?.pause();
             setCurrentTime(0);
+            audioRef.current!.currentTime = 0;
         } else if (queue.indexOf(currentTrack!) == queue.length - 1) {
             setCurrentTrack(queue[0]);
         } else {
@@ -204,7 +209,7 @@ export default function MainPlayer() {
                         </div>
                         <div className="hidden relative lg:flex flex-col items-center p-2 ml-4 -mr-8 w-9 h-9 z-10 transition ease-in-out duration-700 group g">
                             <FontAwesomeIcon icon={audioRef.current?.volume! > 0.4 ? faVolumeHigh : audioRef.current?.volume == 0 ? faVolumeMute : faVolumeLow} className="size-5 cursor-pointer transition ease-in-out duration-700 group-hover:text-black" onClick={handleMute} />
-                            <input type="range" className="vert absolute bottom-3/4 mb-2 hidden group-hover:flex hover:flex w-24 m-8 transition ease-in-out duration-700" min={0} max={1} step={0.05} onChange={handleVolume} />
+                            <input type="range" className="vert absolute bottom-3/4 mb-2 hidden group-hover:flex hover:flex w-24 m-8 transition ease-in-out duration-700" value={audioRef.current?.volume} min={0} max={1} step={0.05} onChange={handleVolume} />
                         </div>
                     </div>
                 </div>

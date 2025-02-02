@@ -456,7 +456,7 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
         setTimeout(() => {
             isCurrentlySetting.current = false;
-        }, 200);
+        }, 600);
     };
 
     const search = async (term: string) => {
