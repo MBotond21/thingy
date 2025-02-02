@@ -3,6 +3,7 @@ import { TrackContext } from "../contexts/MusicContext";
 import { Track } from "../track";
 import { Album } from "../album";
 import { Artist } from "../artist";
+import { useNavigate } from "react-router";
 
 interface Props {
     type: string;
@@ -11,9 +12,11 @@ interface Props {
 
 export default function Top(props: Props) {
 
-    const { loadTopTracks, loadTopAlbums, loadTopArtists, wtracks, mtracks, walbums, malbums, wartists, martists } = useContext(TrackContext);
+    const navigate = useNavigate();
 
-    const dataMap: Record<string, Track[] | Album[] | Artist[]> = {
+    const {loadAlbum, loadArtist, loadTopTracks, loadTopAlbums, loadTopArtists, wtracks, mtracks, walbums, malbums, wartists, martists, setQueue, setCurrentTrackFR, setActive } = useContext(TrackContext);
+
+    const dataMap: Record<string, any[]> = {
         weektracks: wtracks,
         monthtracks: mtracks,
         weekalbums: walbums,
@@ -23,6 +26,8 @@ export default function Top(props: Props) {
     }
 
     useEffect(() => {
+        console.log("AAAAacfAsd")
+        setCurrentTrackFR(undefined);
         if (props.from == "tracks") {
             loadTopTracks(props.type);
         } else if(props.from == "albums") {
@@ -32,15 +37,38 @@ export default function Top(props: Props) {
         }
     }, [])
 
+    const handleClick = async (data: any) => {
+        if(props.from == "tracks"){
+            console.log("Top is setting the current track");
+            if(window.innerWidth < 1024){
+                setActive("music");
+            }
+            loadAlbum(data.album_id);
+            setCurrentTrackFR(data as Track);
+            navigate("/albumView");
+        };
+        if(props.from == "albums"){
+            if(window.innerWidth < 1024){
+                setActive("info");
+            }
+            loadAlbum(data.id);
+            navigate("/albumView");
+        };
+        if(props.from == "artists"){
+            loadArtist(data.id);
+            navigate("/artistView");
+        }
+    }
+
     return <>
         <div className="w-full">
             <h1 className="text-3xl font-semibold mb-2" >{props.type.substring(0, 1).toUpperCase() + props.type.substring(1, props.type.length)}ly top {props.from}</h1>
             <div className="flex flex-row gap-10 overflow-scroll">
                 {
-                    dataMap[props.type.concat(props.from)].map((track) => (
+                    dataMap[props.type.concat(props.from)].map((data) => (
                         <div className="flex flex-col">
-                            <img src={track.image} alt="track" className="size-20" />
-                            <p className="overflow-hidden w-24 h-12 hover:cursor-default" title={track.name}>{track.name}</p>
+                            <img src={data.image} alt="track" className="size-20 cursor-pointer" onClick={() => handleClick(data)} />
+                            <p className="overflow-hidden w-24 h-12 hover:cursor-default" title={data.name}>{data.name}</p>
                         </div>
                     ))
                 }

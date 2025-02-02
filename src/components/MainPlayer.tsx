@@ -3,71 +3,85 @@ import { TrackContext } from "../contexts/MusicContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPause, faForwardStep, faBackwardStep, faVolumeMute, faVolumeLow, faVolumeHigh } from "@fortawesome/free-solid-svg-icons";
 import { Track } from "../track";
+import { useNavigate } from "react-router";
 
 export default function MainPlayer() {
-    const { track, loadTrack, changeInfoActive, queue, loadAlbum } = useContext(TrackContext);
+    const { track, loadTrack, queue, loadAlbum, currentTrack, setCurrentTrackFR, loadArtist } = useContext(TrackContext);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    const [currentTime, setCurrentTime] = useState(0);
-    const [duration, setDuration] = useState(0);
-    const [isPlaying, setIsPlaying] = useState(false);
-
-    const [currentTrack, setCurrentTrack] = useState<Track>(queue[0]);
+    const [currentTime, setCurrentTime] = useState<number>(0);
+    const [duration, setDuration] = useState<number>(0);
+    const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
     const [isFirstPlay, setIsFirstPlay] = useState<boolean>(true);
 
-    useEffect(() => {
-        //loadTrack("887211");
-        loadAlbum("104336")
-    }, []);
+    const [volume, setVolume] = useState<number>(1);
 
-    useEffect(() =>{
-        setCurrentTrack(queue[0]);
-    }, [queue])
+    const setCurrentTrack = setCurrentTrackFR;
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (queue.length > 0 && !currentTrack) {
+            console.log("MainPlayer is setting the current track:", queue[0]);
+            setCurrentTrack(queue[0]);
+        }
+    }, [queue]);
 
     useEffect(() => {
         const audio = audioRef.current;
+        if (!audio) return;
 
-        if (audio) {
-            const updateProgress = () => {
-                setCurrentTime(audio.currentTime);
-                setDuration(audio.duration || 0);
-            };
+        const updateProgress = () => {
+            setCurrentTime(audio.currentTime);
+            setDuration(audio.duration || 0);
+        };
 
-            audio.addEventListener("timeupdate", updateProgress);
-            audio.addEventListener("loadedmetadata", updateProgress);
-            audio.addEventListener("play", () => setIsPlaying(true));
-            audio.addEventListener("pause", () => setIsPlaying(false));
+        const handlePlay = () => setIsPlaying(true);
+        const handlePause = () => setIsPlaying(false);
 
-            return () => {
-                audio.removeEventListener("timeupdate", updateProgress);
-                audio.removeEventListener("loadedmetadata", updateProgress);
-                audio.removeEventListener("play", () => setIsPlaying(true));
-                audio.removeEventListener("pause", () => setIsPlaying(false));
-            };
-        }
+        audio.addEventListener("timeupdate", updateProgress);
+        audio.addEventListener("loadedmetadata", updateProgress);
+        audio.addEventListener("play", handlePlay);
+        audio.addEventListener("pause", handlePause);
+
+        return () => {
+            audio.removeEventListener("timeupdate", updateProgress);
+            audio.removeEventListener("loadedmetadata", updateProgress);
+            audio.removeEventListener("play", handlePlay);
+            audio.removeEventListener("pause", handlePause);
+        };
     }, []);
 
-    useEffect(() => {
-        if(currentTime == duration){
-            if(queue.indexOf(currentTrack) != queue.length-1){
-                setCurrentTrack(queue[queue.indexOf(currentTrack)+1]);
-            } else{
+    const stepTrack = () => {
+        if (currentTime == duration) {
+            if (queue.indexOf(currentTrack!) != queue.length - 1) {
+                setCurrentTrack(queue[queue.indexOf(currentTrack!) + 1]);
+            } else {
                 setCurrentTrack(queue[0]);
             }
             setCurrentTime(0);
         }
+    }
+
+    useEffect(() => {
+        stepTrack();
     }, [currentTime])
 
     useEffect(() => {
-        if (audioRef.current) {
-            audioRef.current.load();
-            if(!isFirstPlay){
-                audioRef.current.play();
+        if (!audioRef.current || !currentTrack?.audio) return;
+
+        const timeout = setTimeout(() => {
+            if (audioRef.current) {
+                audioRef.current.src = currentTrack.audio;
+                audioRef.current.load();
+                if (!isFirstPlay) {
+                    audioRef.current.play().catch(err => console.warn("Autoplay prevented:", err));
+                }
             }
             setIsFirstPlay(false);
-            changeInfoActive(true);
-        }
+        }, 500);
+
+        return () => clearTimeout(timeout);
     }, [currentTrack?.audio]);
 
     useEffect(() => {
@@ -102,25 +116,49 @@ export default function MainPlayer() {
         }
     };
 
+    const handleVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const audio = audioRef.current;
+        if (audio) {
+            audio.volume = parseFloat(e.target.value);
+            setVolume(audio.volume);
+            e.target.style.background = `linear-gradient(to top, #FDDA0D 0%, #FDDA0D ${parseFloat(e.target.value) * 100}%, #ccc ${parseFloat(e.target.value) * 100}%)`;
+        }
+    };
+
+    const handleMute = () => {
+        const audio = audioRef.current;
+        if (audio) {
+            if (audio.volume > 0) {
+                audio.volume = 0;
+            } else {
+                audio.volume = volume;
+            }
+        }
+    }
+
     const handleStep = (n: number) => {
 
-        if(queue.indexOf(currentTrack) == 0 && n < 0){
+        if (queue.indexOf(currentTrack!) == 0 && n < 0) {
             audioRef.current?.pause();
-            setCurrentTime(0); 
-        }else if(queue.indexOf(currentTrack) == queue.length-1){
+            setCurrentTime(0);
+        } else if (queue.indexOf(currentTrack!) == queue.length - 1) {
             setCurrentTrack(queue[0]);
-        }else{
-            let temp = queue.indexOf(currentTrack ) + n;
+        } else {
+            let temp = queue.indexOf(currentTrack!) + n;
             setCurrentTrack(queue[temp]);
         }
         setCurrentTime(0);
-        
+    }
+
+    const handleClick = async (data: any) => {
+        loadArtist(data.artist_id);
+        navigate("/artistView");
     }
 
     return <>
         <div className="content">
-            <img src={currentTrack?.image} alt="trackPic" className="hover:cursor-default track" />
-            <p className="text-2xl mt-1 hover:cursor-default" ><b>{currentTrack?.artist_name}</b> - {currentTrack?.name}</p>
+            <img src={currentTrack?.image} alt="trackPic" className="hover:cursor-default track size-52 md:size-72" />
+            <p className="text-xl md:text-2xl mt-1 hover:cursor-default w-2/4 text-center"><b className="hover:cursor-pointer hover:underline" onClick={() => handleClick(currentTrack)}>{currentTrack?.artist_name}</b> - {currentTrack?.name}</p>
             <div className="w-full m-4">
                 <audio ref={audioRef} className="w-3/4 ml-f-3/4 hover:cursor-default">
                     <source src={currentTrack?.audio} type="audio/mpeg" />
@@ -141,29 +179,34 @@ export default function MainPlayer() {
                             <FontAwesomeIcon icon={faForwardStep} className="size-5" />
                         </button>
                     </div>
-                    <div className="flex items-center justify-center gap-2">
-                        <span id="current-time">{formatTime(currentTime)}</span>
-                        <input
-                            id="seek-bar"
-                            type="range"
-                            min="0"
-                            max={duration.toString()}
-                            step="1"
-                            value={currentTime}
-                            onChange={handleSeek}
-                            style={{
-                                width: "50%",
-                                height: "0.5rem",
-                                background: "linear-gradient(to right, #00f 0%, #00f 0%, #ccc 0%)",
-                                borderRadius: "2px",
-                                outline: "none",
-                                appearance: "none",
-                                cursor: "pointer",
-                            }}
-                        />
-                        <span id="duration">{formatTime(duration)}</span>
+                    <div className="flex felx-row items-center justify-center">
+                        <div className="flex items-center justify-center gap-2 mr-1">
+                            <span id="current-time" className="w-8">{formatTime(currentTime)}</span>
+                            <input
+                                id="seek-bar"
+                                type="range"
+                                min="0"
+                                max={duration.toString()}
+                                step="1"
+                                value={currentTime}
+                                onChange={handleSeek}
+                                style={{
+                                    width: "15rem",
+                                    height: "0.5rem",
+                                    background: "linear-gradient(to right, #00f 0%, #00f 0%, #ccc 0%)",
+                                    borderRadius: "2px",
+                                    outline: "none",
+                                    appearance: "none",
+                                    cursor: "pointer",
+                                }}
+                            />
+                            <span id="duration" className="w-8">{formatTime(duration)}</span>
+                        </div>
+                        <div className="hidden relative lg:flex flex-col items-center p-2 ml-4 -mr-8 w-9 h-9 z-10 transition ease-in-out duration-700 group g">
+                            <FontAwesomeIcon icon={audioRef.current?.volume! > 0.4 ? faVolumeHigh : audioRef.current?.volume == 0 ? faVolumeMute : faVolumeLow} className="size-5 cursor-pointer transition ease-in-out duration-700 group-hover:text-black" onClick={handleMute} />
+                            <input type="range" className="vert absolute bottom-3/4 mb-2 hidden group-hover:flex hover:flex w-24 m-8 transition ease-in-out duration-700" min={0} max={1} step={0.05} onChange={handleVolume} />
+                        </div>
                     </div>
-
                 </div>
             </div>
         </div>

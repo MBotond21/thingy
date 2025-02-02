@@ -8,7 +8,7 @@ export default function Header(){
 
     return <>
         <header>
-            <img src="/vite.svg" alt="site" className="size-12 hover:cursor-pointer" onClick={() => navigate("/")} />
+            <img src="/vite.svg" alt="site" className="size-12 hover:cursor-pointer hue-rotate-60 rotate-6" onClick={() => navigate("/")} />
             <SearchBar/>
             <AccComp/>
         </header>

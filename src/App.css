@@ -41,6 +41,10 @@ header {
     background-color: #222;
 }
 
+.bg-111{
+    background-color: #111;
+}
+
 .h-9\/10{
     height: 90%;
     max-height: 90%;
@@ -104,19 +108,6 @@ main{
     gap: 1rem;
 }
 
-.formPage{
-    position: absolute;
-    top: 5%;
-    left: 35%;
-    min-width: 30%;
-    max-width: 80%;
-    height: 85%;
-    padding: 1rem;
-    border-radius: 8px;
-    background-color: #222;
-    color: white;
-}
-
 .content {
     display: flex;
     flex-direction: column;
@@ -130,7 +121,7 @@ main{
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
 
-  input[type="range"] {
+  input[type="range"]#seek-bar {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
@@ -139,6 +130,12 @@ main{
     border-radius: 2px;
     outline: none;
     cursor: pointer;
+  }
+
+  @media screen and (max-width: 768px){
+    input[type="range"]#seek-bar {
+        width: 12rem !important;
+      }
   }
 
   input[type="range"]::-webkit-slider-thumb {
@@ -160,10 +157,91 @@ main{
     height: 0;
     background: transparent;
   }
+
+  .flex-2{
+    flex: 2;
+  }
+
+  input[type="range"].vert {
+    writing-mode: vertical-lr;
+    direction: rtl;
+    appearance: none;
+    width: 8px;
+    height: 8rem;
+    background: #000 !important;
+    border-radius: 4px;
+    animation: volumeAnim 700ms ease-in-out;
+}
+
+.bottom-34{
+    bottom: 8.5rem;
+}
+
+input[type="range"].vert::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #222;
+    border: #222;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+input[type="range"].vert::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #222;
+    border: #222;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+input[type="range"].vert::-ms-thumb {
+    width: 16px;
+    height: 16px;
+    background: #222;
+    border: #222;
+    border-radius: 50%;
+    cursor: pointer;
+}
   
   @media screen and (max-width: 1280px) {
     .tsm {
         display: flex;
         flex-direction: column;
     }
+}
+
+@keyframes volumeAnim {
+    0%{
+        height: 0;
+    }
+    100%{
+        height: 8rem;
+    }
+}
+
+@keyframes volumeBgAnim {
+    0%{
+        top: -0.5rem;
+    }
+    100%{
+        height: -9rem;
+    }
+}
+
+.g::before{
+    animation: volumeBgAnim 700ms ease-in-out;
+}
+
+.g:hover::before{
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -9rem;
+    bottom: -0.5rem;
+    left: -0.5rem;
+    right: -0.5rem;
+    background: #cbcbcb;
+    border-radius: 30px;
 }

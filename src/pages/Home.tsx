@@ -1,16 +1,10 @@
 import Header from "../components/Header";
+import Main_demo from "../components/Main_demo";
 import Main from "../components/Main";
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { TrackContextProvider } from '../contexts/MusicContext';
 
 export default function Home() {
     return <>
         <Header />
-        <TrackContextProvider>
-            <DndProvider backend={HTML5Backend}>
-                <Main />
-            </DndProvider>
-        </TrackContextProvider>
+        <Main />
     </>
 }
