@@ -245,3 +245,15 @@ input[type="range"].vert::-ms-thumb {
     background: #cbcbcb;
     border-radius: 30px;
 }
+
+.scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .scrollbar-hidden {
+    scrollbar-width: none;
+  }
+  
+  .overflow-scroll {
+    overflow: auto;
+  }  

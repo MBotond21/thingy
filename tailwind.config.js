@@ -16,6 +16,9 @@ export default {
       },
       inset: {
         '2/5': "40%",
+      },
+      screens: {
+        xxl: '1921px',
       }
     },
   },

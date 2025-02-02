@@ -31,7 +31,7 @@ export default function Artist() {
                                 </p>
                             </div>
                         </div>
-                        <div className="flex flex-row gap-10 overflow-scroll mt-auto">
+                        <div className="flex flex-row gap-10 overflow-scroll scrollbar-hidden mt-auto">
                             {artist?.albums?.map((album) => (
                                 <div key={album.id} className="flex flex-col items-center">
                                     <div className="w-32 h-32 flex-shrink-0">

@@ -5,7 +5,7 @@ export default function Signup() {
 
     return <>
         <main className="w-full h-full flex justify-center items-center">
-            <div className="bg-222  w-4/5 h-4/5 md:w-2/5 lg:w-1/4 rounded-lg">
+            <div className="bg-222  w-4/5 h-4/5 lg:w-2/4 xl:w-1/4 rounded-lg">
                 <div className="w-full h-1/3 flex items-center justify-center">
                     <img src="/vite.svg" alt="site" onClick={() => navigate("/")} className="w-1/3 h-1/3 hover:cursor-pointer hue-rotate-90 rotate-6" />
                 </div>

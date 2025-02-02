@@ -62,13 +62,13 @@ export default function Top(props: Props) {
 
     return <>
         <div className="w-full">
-            <h1 className="text-3xl font-semibold mb-2" >{props.type.substring(0, 1).toUpperCase() + props.type.substring(1, props.type.length)}ly top {props.from}</h1>
-            <div className="flex flex-row gap-10 overflow-scroll">
+            <h1 className="text-3xl xxl:text-5xl font-semibold mb-2" >{props.type.substring(0, 1).toUpperCase() + props.type.substring(1, props.type.length)}ly top {props.from}</h1>
+            <div className="flex flex-row gap-10 overflow-scroll scrollbar-hidden">
                 {
                     dataMap[props.type.concat(props.from)].map((data) => (
                         <div className="flex flex-col">
-                            <img src={data.image} alt="track" className="size-20 cursor-pointer" onClick={() => handleClick(data)} />
-                            <p className="overflow-hidden w-24 h-12 hover:cursor-default" title={data.name}>{data.name}</p>
+                            <img src={data.image} alt="track" className="size-20 xxl:size-28 cursor-pointer" onClick={() => handleClick(data)} />
+                            <p className="overflow-hidden w-24 xxl:w-28 h-12 hover:cursor-default" title={data.name}>{data.name}</p>
                         </div>
                     ))
                 }
