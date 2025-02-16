@@ -1,12 +1,15 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { TrackContext } from "../contexts/MusicContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPause, faForwardStep, faBackwardStep, faVolumeMute, faVolumeLow, faVolumeHigh } from "@fortawesome/free-solid-svg-icons";
+import { faPlay, faPause, faForwardStep, faBackwardStep, faVolumeMute, faVolumeLow, faVolumeHigh, faHeartCirclePlus, faHeartCircleMinus, faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import { Track } from "../track";
 import { useNavigate } from "react-router";
+import { AuthContext } from "../contexts/AuthContext";
 
 export default function MainPlayer() {
     const { track, loadTrack, queue, loadAlbum, currentTrack, setCurrentTrackFR, loadArtist } = useContext(TrackContext);
+    const { user } = useContext(AuthContext);
+    const { like } = useContext(AuthContext);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
     const [currentTime, setCurrentTime] = useState<number>(0);
@@ -24,8 +27,15 @@ export default function MainPlayer() {
         if (queue.length > 0 && !currentTrack) {
             console.log("MainPlayer is setting the current track:", queue[0]);
             setCurrentTrack(queue[0]);
+        } else if (queue.length == 1) {
+            console.log("MainPlayer is setting the current track:", queue[0]);
+            setCurrentTrack(queue[0]);
         }
     }, [queue]);
+
+    useEffect(() => {
+        console.log(`The current track is set to: `, currentTrack);
+    }, [currentTrack]);
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -45,7 +55,7 @@ export default function MainPlayer() {
         audio.addEventListener("pause", handlePause);
 
         const vol = localStorage.getItem("volume");
-        if(vol) audio.volume = parseFloat(vol);
+        if (vol) audio.volume = parseFloat(vol);
 
         return () => {
             audio.removeEventListener("timeupdate", updateProgress);
@@ -160,6 +170,15 @@ export default function MainPlayer() {
         navigate("/artistView");
     }
 
+    const isLiked = (id: number) => {
+
+        if (!user || !user.Playlists) return false;
+
+        const ids = new Set(user.Playlists[0].Tracks?.map((t) => +t.SongID!));
+
+        return ids.has(id);
+    }
+
     return <>
         <div className="content">
             <img src={currentTrack?.image} alt="trackPic" className="hover:cursor-default track size-52 md:size-72" />
@@ -170,6 +189,15 @@ export default function MainPlayer() {
                 </audio>
                 <div className="w-3/4 ml-f-3/4 inline h-6">
                     <div className="flex items-center justify-center gap-10">
+                        {
+                            user ? (
+                                <button className="size-5">
+                                    <FontAwesomeIcon icon={isLiked(+currentTrack?.id!) ? faHeartCircleMinus : faHeartCirclePlus} className={`size-5 ${isLiked(+currentTrack?.id!)? "text-pink-300": ""}`} onClick={() => like(currentTrack?.id!)} />
+                                </button>
+                            ) : (
+                                <span></span>
+                            )
+                        }
                         <button className="size-5" onClick={() => handleStep(-1)}>
                             <FontAwesomeIcon icon={faBackwardStep} className="size-5" />
                         </button>
@@ -183,6 +211,15 @@ export default function MainPlayer() {
                         <button className="size-5" onClick={() => handleStep(1)}>
                             <FontAwesomeIcon icon={faForwardStep} className="size-5" />
                         </button>
+                        {
+                            user ? (
+                                <button className="size-5">
+                                    <FontAwesomeIcon icon={faCirclePlus} className="size-5" />
+                                </button>
+                            ):(
+                                <span></span>
+                            )
+                        }
                     </div>
                     <div className="flex felx-row items-center justify-center">
                         <div className="flex items-center justify-center gap-2 mr-1">

@@ -43,8 +43,8 @@ export default function Top(props: Props) {
             if(window.innerWidth < 1024){
                 setActive("music");
             }
-            loadAlbum(data.album_id);
             setCurrentTrackFR(data as Track);
+            loadAlbum(data.album_id);
             navigate("/albumView");
         };
         if(props.from == "albums"){

@@ -8,5 +8,6 @@ export interface Track{
     releasedate: string;
     album_image: string;
     audio: string;
-    image: string;  
+    image: string;
+    SongID?: number;
 }

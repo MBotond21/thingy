@@ -212,6 +212,14 @@ input[type="range"].vert::-ms-thumb {
     }
 }
 
+@media screen and (max-width: 1920px) {
+    .sm {
+        flex-direction: column;
+        width: fit-content;
+        align-items: center;
+    }
+}
+
 @keyframes volumeAnim {
     0%{
         height: 0;

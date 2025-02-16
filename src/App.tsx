@@ -8,25 +8,33 @@ import { TrackContextProvider } from './contexts/MusicContext';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Artist from './pages/Artist';
+import { AuthProvider } from './contexts/AuthContext';
+import Account from './pages/Account';
+import PlaylistView from './pages/PlaylistView';
+import Accounts from './pages/Accounts';
 
 function App() {
 
   return (
     <>
-      <TrackContextProvider>
-        <DndProvider backend={HTML5Backend}>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/albumView" element={<AlbumView />} />
-              <Route path='/artistView' element={<Artist />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/account" element={<h1>Acc</h1>} />
-            </Routes>
-          </BrowserRouter>
-        </DndProvider>
-      </TrackContextProvider>
+      <AuthProvider>
+        <TrackContextProvider>
+          <DndProvider backend={HTML5Backend}>
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/albumView" element={<AlbumView />} />
+                <Route path='/artistView' element={<Artist />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/account" element={<Account/>} />
+                <Route path='/accounts/:id' element={<Accounts />} />
+                <Route path='/playlist/:id' element={<PlaylistView/>} />
+              </Routes>
+            </BrowserRouter>
+          </DndProvider>
+        </TrackContextProvider>
+      </AuthProvider>
     </>
   )
 }

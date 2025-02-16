@@ -449,14 +449,15 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
 
     const setCurrentTrackFR = async (track: Track | undefined) => {
-        if (isCurrentlySetting.current) return;
+        // if (isCurrentlySetting.current) return;
 
-        isCurrentlySetting.current = true;
+        // isCurrentlySetting.current = true;
+        // await setCurrentTrack((prev) => track);
+
+        // setTimeout(() => {
+        //     isCurrentlySetting.current = false;
+        // }, 600);
         setCurrentTrack(track);
-
-        setTimeout(() => {
-            isCurrentlySetting.current = false;
-        }, 600);
     };
 
     const search = async (term: string) => {
