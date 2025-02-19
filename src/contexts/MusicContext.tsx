@@ -1,4 +1,4 @@
-import { createContext, useRef, useState } from "react";
+import { createContext, useEffect, useRef, useState } from "react";
 import { Track } from "../track";
 import { Album } from "../album";
 import { Artist } from "../artist";
@@ -87,6 +87,14 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const isCurrentlySetting = useRef(false);
 
     const client_id = "8b1de417";
+
+    // useEffect(() => {
+    //     const load = async () => {
+    //         const album = await loadAlbum();
+    //         console.log(album);
+    //     }
+    //     load();
+    // }, [])
 
     const toReadable = (text: string) => {
         const parser = new DOMParser();
@@ -219,60 +227,70 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
             });
     }
 
-    const loadAlbum = async (id: string) => {
-        setAlbum(undefined);
-        console.log("loading...");
-        await fetch(`https://api.jamendo.com/v3.0/albums/tracks/?client_id=${client_id}&format=jsonpretty&id=${id}`, {
-            method: 'GET',
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
+    const loadAlbum = async (id?: string) => {
+        if (!id) {
+            const ize = await localStorage.getItem("album");
+            if (ize) setAlbum(JSON.parse(ize));
+            console.log("damn");
+        }
+        else {
+            setAlbum(undefined);
+            console.log("loading...");
+            await fetch(`https://api.jamendo.com/v3.0/albums/tracks/?client_id=${client_id}&format=jsonpretty&id=${id}`, {
+                method: 'GET',
             })
-            .then(async (data) => {
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(async (data) => {
 
-                let a: Album = {
-                    id: data.results[0].id,
-                    name: data.results[0].name,
-                    artist_id: data.results[0].artist_id,
-                    artist_name: toReadable(data.results[0].artist_name)!,
-                    releasedate: data.results[0].releasedate,
-                    image: data.results[0].image,
-                    tracks: []
-                }
-
-                if (await compareImagesByteToByte(a.image)) {
-                    a.image = (await loadPicForSingle(a.id)).toString();
-                }
-
-                for (let i = 0; i < data.results[0].tracks.length; i++) {
-
-                    let t: Track = {
-                        id: data.results[0].tracks[i].id,
-                        name: data.results[0].tracks[i].name,
-                        duration: +data.results[0].tracks[i].duration,
+                    let a: Album = {
+                        id: data.results[0].id,
+                        name: data.results[0].name,
                         artist_id: data.results[0].artist_id,
                         artist_name: toReadable(data.results[0].artist_name)!,
-                        album_id: data.results[0].id,
                         releasedate: data.results[0].releasedate,
-                        album_image: a.image,
-                        audio: data.results[0].tracks[i].audio,
-                        image: a.image
+                        image: data.results[0].image,
+                        tracks: []
                     }
 
-                    a.tracks!.push(t);
-                }
+                    if (await compareImagesByteToByte(a.image)) {
+                        a.image = (await loadPicForSingle(a.id)).toString();
+                    }
 
-                setAlbum(a);
+                    for (let i = 0; i < data.results[0].tracks.length; i++) {
 
-                console.log("loaded");
-            })
-            .catch((error) => {
-                console.log("An error occured while loading the album", error);
-                alert("kabe");
-            });
+                        let t: Track = {
+                            id: data.results[0].tracks[i].id,
+                            name: data.results[0].tracks[i].name,
+                            duration: +data.results[0].tracks[i].duration,
+                            artist_id: data.results[0].artist_id,
+                            artist_name: toReadable(data.results[0].artist_name)!,
+                            album_id: data.results[0].id,
+                            releasedate: data.results[0].releasedate,
+                            album_image: a.image,
+                            audio: data.results[0].tracks[i].audio,
+                            image: a.image
+                        }
+
+                        a.tracks!.push(t);
+                    }
+
+                    setAlbum(a);
+                    if (a.tracks) setQueue(a.tracks);
+                    localStorage.setItem("album", JSON.stringify(a));
+
+                    console.log("loaded");
+                })
+                .catch((error) => {
+                    console.log("An error occured while loading the album", error);
+                    alert("kabe");
+                });
+        }
+
     }
 
     const loadArtist = async (id: string) => {
@@ -337,7 +355,7 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
         const fetchFunction = async () => {
             const response = await fetch(
-                `https://api.jamendo.com/v3.0/tracks/?client_id=${client_id}&format=jsonpretty&order=popularity_${type}&limit=5`
+                `https://api.jamendo.com/v3.0/tracks/?client_id=${client_id}&format=jsonpretty&order=popularity_${type}&limit=5&offset=1`
             );
             if (!response.ok) {
                 throw new Error(`HTTP error! Status: ${response.status}`);
@@ -446,7 +464,6 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
         console.log("loaded");
     }
-
 
     const setCurrentTrackFR = async (track: Track | undefined) => {
         // if (isCurrentlySetting.current) return;

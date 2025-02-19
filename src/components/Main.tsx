@@ -5,12 +5,50 @@ import PlaylistsPrev from "./PlaylistPrev";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import CreateDialog from "./CreateDialog";
+import { CreateDialogv2 } from "./CreateDialogv2";
+import imageCompression from "browser-image-compression";
+import { TrackContext } from "../contexts/MusicContext";
+import MainPlayer from "./MainPlayer";
 
 export default function Main() {
 
-    const [loggedIn, setLoggedIn] = useState<boolean>(false);
     const [isCreating, setIsCreating] = useState<boolean>(false);
-    const { user } = useContext(AuthContext);
+    const { user, createPlaylist } = useContext(AuthContext);
+    const { currentTrack } = useContext(TrackContext)
+
+    const [name, setName] = useState<string>("");
+    const [desc, setDesc] = useState<string>("");
+    const [cover, setCover] = useState<File>();
+    const [priv, setPriv] = useState<boolean>(false);
+
+    const handleFileChange = async (event: any) => {
+        const file = event.target.files[0];
+
+        if (file) {
+
+            // const options = {
+            //     maxSizeMB: 0.05,
+            //     maxWidthOrHeight: 300,
+            //     useWebWorker: true,
+            // };
+
+            // try {
+            //     let compressed = await imageCompression(file, options);
+
+            //     const blob = new Blob([compressed], { type: compressed.type });
+            //     setCover(blob);
+            // } catch { console.log("Error during compression"); }
+
+            setCover(file);
+
+        }
+    };
+
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+        await createPlaylist(name, priv, desc, cover);
+        handleClose();
+    }
 
     const handleClose = () => setIsCreating(false);
 
@@ -49,14 +87,40 @@ export default function Main() {
                     <Top type="month" from="artists" />
                 </div>
             </div>
+            {
+                currentTrack ? (
+                    <section className="flex-2 xl:h-full w-full flex-col justify-center gap-10 bg-222 rounded-lg text-white h-9/10">
+                        <MainPlayer />
+                    </section>
+                ) : (
+                    <span></span>
+                )
+            }
         </main>
         {
             isCreating ? (
                 <>
-                    <div className="absolute z-40 w-full h-full top-0 left-0 bg-black opacity-25 flex items-center justify-center"></div>
-                    <div className="absolute z-50 w-full h-full top-0 left-0 flex items-center justify-center">
-                        <CreateDialog close={handleClose} />
-                    </div>
+                    <CreateDialogv2 props={{ caption: "Playlist", close: handleClose }}>
+                        <form className="p-4 flex flex-col gap-12 text-lg h-full items-center">
+                            <div className="flex felx-row gap-2 mt-20 w-full items-center justify-between">
+                                <label htmlFor="name">Name: </label>
+                                <input type="text" name="name" className="rounded-lg p-1 w-3/5 border-2 outline-none transition-all bg-333 border-white focus:border-yellow-400 text-white" onChange={(e) => setName(e.target.value)} required />
+                            </div>
+                            <div className="flex felx-row gap-2 w-full items-center justify-between">
+                                <label htmlFor="desc">Description: </label>
+                                <input type="text" name="desc" className="rounded-lg p-1 w-3/5 border-2 outline-none transition-all bg-333 border-white focus:border-yellow-400 text-white" onChange={(e) => setDesc(e.target.value)} />
+                            </div>
+                            <div className="flex felx-row gap-2 w-full items-center justify-between">
+                                <label htmlFor="cover">Cover: </label>
+                                <input type="file" name="cover" onChange={(e) => handleFileChange(e)} />
+                            </div>
+                            <div className="flex felx-row gap-2 w-full items-center">
+                                <label htmlFor="private">Private: </label>
+                                <input type="checkbox" name="private" onChange={(e) => setPriv(e.target.checked)} />
+                            </div>
+                            <button type="submit" className="bg-white text-gray222 font-semibold w-fit p-1 rounded-md hover:bg-white-kinda" onClick={(e) => handleSubmit(e)}>Create</button>
+                        </form>
+                    </CreateDialogv2>
                 </>
             ) : (
                 <span></span>

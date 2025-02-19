@@ -15,7 +15,7 @@ export default function Login() {
         const res = await login(email, psw);
         setError(res);
         console.log(history);
-        //if (!res) history.back();
+        if (!res) history.back();
     }
 
     useEffect(() => {

@@ -26,8 +26,6 @@ export default function Top(props: Props) {
     }
 
     useEffect(() => {
-        console.log("AAAAacfAsd")
-        setCurrentTrackFR(undefined);
         if (props.from == "tracks") {
             loadTopTracks(props.type);
         } else if(props.from == "albums") {
@@ -39,24 +37,23 @@ export default function Top(props: Props) {
 
     const handleClick = async (data: any) => {
         if(props.from == "tracks"){
-            console.log("Top is setting the current track");
+            setQueue([]);
             if(window.innerWidth < 1024){
                 setActive("music");
             }
+            console.log("Top");
             setCurrentTrackFR(data as Track);
-            loadAlbum(data.album_id);
-            navigate("/albumView");
+            navigate(`/albumView/${data.album_id}`);
         };
         if(props.from == "albums"){
+            setQueue([]);
             if(window.innerWidth < 1024){
                 setActive("info");
             }
-            loadAlbum(data.id);
-            navigate("/albumView");
+            navigate(`/albumView/${data.id}`);
         };
         if(props.from == "artists"){
-            loadArtist(data.id);
-            navigate("/artistView");
+            navigate(`/artistView/${data.id}`);
         }
     }
 

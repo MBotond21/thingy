@@ -1,25 +1,30 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import Header from "../components/Header";
 import { TrackContext } from "../contexts/MusicContext";
 import { Album } from "../album";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
+import MainPlayer from "../components/MainPlayer";
 
 export default function Artist() {
 
-    const { artist, loadAlbum } = useContext(TrackContext);
+    const { artist, loadArtist, currentTrack } = useContext(TrackContext);
+    const { id } = useParams();
 
     const navigate = useNavigate();
 
+    useEffect(() => {
+        if (id) loadArtist(id);
+    }, [])
+
     const handleClick = (data: Album) => {
-        loadAlbum(data.id);
-        navigate("/albumView");
+        navigate(`/albumView/${data.id}`);
     }
 
     return <>
         <Header />
         {
             artist ? (
-                <main className="flex flex-row h-5/6 w-full text-white gap-2 p-4 transition-all">
+                <main className="flex flex-2 flex-row h-5/6 w-full text-white gap-2 p-4 transition-all">
                     <section className="flex-2 flex xl:h-full flex-col gap-10 bg-222 rounded-lg p-8 overflow-hidden">
                         <div className="flex flex-col sm:flex-row gap-4">
                             <img src={artist?.image} alt="albumPic" className="size-64 md:size-72 object-cover" />
@@ -42,8 +47,17 @@ export default function Artist() {
                             ))}
                         </div>
                     </section>
+                    {
+                        currentTrack ? (
+                            <section className="flex-1 xl:h-full w-full flex-col justify-center gap-10 bg-222 rounded-lg">
+                                <MainPlayer />
+                            </section>
+                        ) : (
+                            <span></span>
+                        )
+                    }
                 </main>
-            ): (
+            ) : (
                 <div className="w-full h-4/5 flex items-center justify-center">
                     <svg aria-hidden="true" className="w-16 h-16 text-gray-200 animate-spin dark:text-gray-600 fill-yellow-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />

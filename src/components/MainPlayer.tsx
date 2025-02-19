@@ -2,13 +2,13 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { TrackContext } from "../contexts/MusicContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPause, faForwardStep, faBackwardStep, faVolumeMute, faVolumeLow, faVolumeHigh, faHeartCirclePlus, faHeartCircleMinus, faCirclePlus } from "@fortawesome/free-solid-svg-icons";
-import { Track } from "../track";
 import { useNavigate } from "react-router";
 import { AuthContext } from "../contexts/AuthContext";
+import { CreateDialogv2 } from "./CreateDialogv2";
 
 export default function MainPlayer() {
-    const { track, loadTrack, queue, loadAlbum, currentTrack, setCurrentTrackFR, loadArtist } = useContext(TrackContext);
-    const { user } = useContext(AuthContext);
+    const { queue, currentTrack, setCurrentTrackFR, loadArtist } = useContext(TrackContext);
+    const { user, addToPlaylist } = useContext(AuthContext);
     const { like } = useContext(AuthContext);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -20,24 +20,36 @@ export default function MainPlayer() {
 
     const [volume, setVolume] = useState<number>(1);
 
+    const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+    const [playlistIds, setPlaylistIds] = useState<number[]>([]);
+
     const setCurrentTrack = setCurrentTrackFR;
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (queue.length > 0 && !currentTrack) {
-            console.log("MainPlayer is setting the current track:", queue[0]);
-            setCurrentTrack(queue[0]);
-        } else if (queue.length == 1) {
-            console.log("MainPlayer is setting the current track:", queue[0]);
-            setCurrentTrack(queue[0]);
-        }
-    }, [queue]);
+    // useEffect(() => {
+    //     if (queue.length > 0 && !currentTrack) {
+    //         setCurrentTrack(queue[0]);
+    //     } else if (queue.length == 1) {
+    //         setCurrentTrack(queue[0]);
+    //     }
+    // }, [queue]);
 
     useEffect(() => {
+        console.log("queue: ", queue);
         console.log(`The current track is set to: `, currentTrack);
     }, [currentTrack]);
 
     useEffect(() => {
+
+        if (queue.length > 0 && !currentTrack) {
+            console.log("Mainplayer");
+            setCurrentTrack(queue[0]);
+        } 
+        if (queue.length == 1) {
+            console.log("Mainplayer");
+            setCurrentTrack(queue[0]);
+        }
+
         const audio = audioRef.current;
         if (!audio) return;
 
@@ -103,7 +115,7 @@ export default function MainPlayer() {
             let t = audio.currentTime / audio.duration * 100;
             document.getElementById("seek-bar")!.style.background = `linear-gradient(to right, #FDDA0D 0%, #FDDA0D ${t}%, #ccc ${t}%)`;
         }
-    }, [currentTime])
+    }, [currentTime]);
 
     function formatTime(seconds: number): string {
         const minutes = Math.floor(seconds / 60);
@@ -179,6 +191,23 @@ export default function MainPlayer() {
         return ids.has(id);
     }
 
+    const getPic = (b: Blob | undefined) => {
+        if (!b) return "/playlist_cover.png"
+        return URL.createObjectURL(b);
+    }
+
+    const handleChange = (id: number) => {
+        setPlaylistIds((prev) => 
+            prev.includes(id)? prev.filter((i) => i !== id): [...prev, id]
+        );
+    }
+
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+        const data = await addToPlaylist([currentTrack?.id!], playlistIds);
+        setDialogOpen(false);
+    }
+
     return <>
         <div className="content">
             <img src={currentTrack?.image} alt="trackPic" className="hover:cursor-default track size-52 md:size-72" />
@@ -192,7 +221,7 @@ export default function MainPlayer() {
                         {
                             user ? (
                                 <button className="size-5">
-                                    <FontAwesomeIcon icon={isLiked(+currentTrack?.id!) ? faHeartCircleMinus : faHeartCirclePlus} className={`size-5 ${isLiked(+currentTrack?.id!)? "text-pink-300": ""}`} onClick={() => like(currentTrack?.id!)} />
+                                    <FontAwesomeIcon icon={isLiked(+currentTrack?.id!) ? faHeartCircleMinus : faHeartCirclePlus} className={`size-5 ${isLiked(+currentTrack?.id!) ? "text-pink-300" : ""}`} onClick={() => like(currentTrack?.id!)} />
                                 </button>
                             ) : (
                                 <span></span>
@@ -214,9 +243,9 @@ export default function MainPlayer() {
                         {
                             user ? (
                                 <button className="size-5">
-                                    <FontAwesomeIcon icon={faCirclePlus} className="size-5" />
+                                    <FontAwesomeIcon icon={faCirclePlus} className="size-5" onClick={() => setDialogOpen(true)} />
                                 </button>
-                            ):(
+                            ) : (
                                 <span></span>
                             )
                         }
@@ -252,5 +281,27 @@ export default function MainPlayer() {
                 </div>
             </div>
         </div>
+
+        {
+            dialogOpen ? (
+                <CreateDialogv2 props={{ caption: "Playlists", close: () => setDialogOpen(false) }}>
+                    <form className="flex flex-col p-2 md:p-4 gap-4">
+                        {
+                            user?.Playlists.map((playlist) =>
+                                <div className="flex flex-row items-center gap-6">
+                                    <img src={getPic(playlist.PlaylistCover)} alt="playlistPic" className="size-16 rounded-md" />
+                                    <p className="w-24 overflow-scroll">{playlist.PlaylistName}</p>
+                                    <input type="checkbox" name="add" value={playlist.PlaylistID} checked={playlistIds.includes(playlist.PlaylistID)} onChange={() => handleChange(playlist.PlaylistID)} />
+                                </div>
+                            )
+                        }
+                        <button type="submit" className="bg-white text-gray222 font-semibold w-fit p-1 pl-2 pr-2 rounded-md hover:bg-white-kinda ml-auto mr-auto" onClick={handleSubmit}>Add</button>
+                    </form>
+                </CreateDialogv2>
+            ) : (
+                <span></span>
+            )
+        }
+
     </>
 }

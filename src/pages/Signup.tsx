@@ -4,7 +4,7 @@ import { AuthContext } from "../contexts/AuthContext";
 
 export default function Signup() {
     const navigate = useNavigate();
-    const { reg } = useContext(AuthContext);
+    const { reg, user } = useContext(AuthContext);
     const [email, setEmail] = useState<string>("");
     const [username, setUsername] = useState<string>("");
     const [psw, setPsw] = useState<string>("");
@@ -16,6 +16,10 @@ export default function Signup() {
         setError(res);
         if(!res) navigate('/login');
     }
+
+    useEffect(() => {
+       if(user) history.back(); 
+    }, []);
 
     useEffect(() => {
         setError(undefined);

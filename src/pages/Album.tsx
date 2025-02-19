@@ -6,6 +6,7 @@ import { DraggableItem } from "../components/DraggableItem";
 import AlbumInfo from "../components/AlbumInfo";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfo, faMusic } from "@fortawesome/free-solid-svg-icons";
+import { useParams } from "react-router";
 
 const ITEM_TYPE = 'SECTION';
 
@@ -21,7 +22,8 @@ const componentMap: Record<string, React.ReactNode> = {
 };
 
 export default function AlbumView() {
-    const { album, queue, setQueue, active, setActive } = useContext(TrackContext);
+    const { album, queue, setQueue, active, setActive, loadAlbum } = useContext(TrackContext);
+    const { id } = useParams();
     const [sections, setSections] = useState<Section[]>(() => {
         const storedSections = localStorage.getItem("sections");
         return storedSections
@@ -32,11 +34,15 @@ export default function AlbumView() {
             ];
     });
 
+    // useEffect(() => {
+    //     if (album) {
+    //         setQueue(album.tracks!);
+    //     }
+    // }, [album]);
+
     useEffect(() => {
-        if (album) {
-            setQueue(album.tracks!);
-        }
-    }, [album]);
+        if(id) loadAlbum(id);
+    }, [])
 
     useEffect(() => {
         localStorage.setItem("sections", JSON.stringify(sections));

@@ -11,10 +11,10 @@ interface AuthContextState {
     logout: () => void;
     like: (trackId: string) => void;
     getPlaylist: (PlaylistID: number) => Promise<Playlist | undefined>;
-    createPlaylist: (PlaylistName: string, Private: boolean, Description?: string, PlaylistCover?: ArrayBuffer) => void;
+    createPlaylist: (PlaylistName: string, Private: boolean, Description?: string, PlaylistCover?: File) => void;
     getUser: (id: number) => Promise<Object | undefined>;
     streamPic: (pic: File) => void;
-    addToPlaylist: (trackId: string, playlistId: number) => void;
+    addToPlaylist: (trackId: string[], playlistId: number[]) => void;
 }
 
 export const AuthContext = createContext<AuthContextState>({
@@ -139,9 +139,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }
 
-    const addToPlaylist = async (trackId: string, playlistId: number) => {
+    const addToPlaylist = async (trackId: string[], playlistIds: number[]) => {
         try {
-            const response = await fetch(`http://localhost:3000/playlists/${playlistId}/add/${trackId}`, {
+            const response = await fetch(`http://localhost:3000/playlists/add?trackId=${encodeURIComponent(trackId.join(','))}&playlistIds=${encodeURIComponent(playlistIds.join(','))}`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${token || localStorage.getItem("accessToken")}`,
@@ -154,20 +154,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
 
             const data = await response.json();
-            console.log(data);
+            return data;
 
         } catch (e: any) {
             console.log(e.message);
         }
     }
 
-    const createPlaylist = async (PlaylistName: string, Private: boolean, Description?: string, pic?: ArrayBuffer) => {
+    const createPlaylist = async (PlaylistName: string, Private: boolean, Description?: string, PlaylistCover?: File) => {
         try {
-            const PlaylistCover = pic ? Array.from(new Uint8Array(pic)) : undefined;
+            // const PlaylistCover = pic ? Array.from(new Uint8Array(pic)) : undefined;
+            const f = new FormData();
+            f.append("PlaylistName", PlaylistName);
+            if(PlaylistCover) f.append("PlaylistCover", PlaylistCover);
+            if(Description) f.append("Description", Description);
+            f.append("Private", Private.toString());
             const response = await fetch(`http://localhost:3000/playlists?owner=${user?.Id}`, {
                 method: 'POST',
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ PlaylistName, PlaylistCover, Description, Private }),
+                body: f,
             });
 
             if (!response.ok) {
@@ -185,6 +189,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             user?.Playlists.push(nData);
 
         } catch (e: any) {
+            console.log(PlaylistCover?.size)
             alert(e.message);
         }
     }
