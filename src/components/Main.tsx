@@ -58,45 +58,34 @@ export default function Main() {
     }
 
     return <>
-        <main>
-            {
-                user ? (
-                    <div className="flex flex-1 flex-col bg-222 h-9/10 rounded-lg pl-6 pt-4 pr-6 md:pl-10 md:pt-6 md:pr-10 items-center text-white overflow-scroll">
-                        {
-                            user.Playlists.map((playlist) =>
-                                <PlaylistsPrev playlist={playlist} />
-                            )
-                        }
-                        <button className="hover:bg-gray28 p-2 transition-all rounded-md flex items-center justify-center" onClick={() => handleClick()}>
-                            <FontAwesomeIcon icon={faPlusCircle} className="size-6" />
-                        </button>
-                    </div>
-                ) : (
-                    <span></span>
-                )
-            }
-            <div className={`flex flex-3 bg-222 rounded-lg w-full h-9/10 ${user ? "sm xxl:columns-2" : "columns-2"} col text-white gap-2 p-4 xxl:p-10 transition-all tsm scrollbar-hidden`}>
-                <div className={`flex ${user ? "w-fit" : "w-full"} xl:h-full flex-col justify-center gap-10`}>
-                    <Top type="week" from="tracks" />
-                    <Top type="week" from="albums" />
-                    <Top type="week" from="artists" />
+        {
+            user ? (
+                <div className="flex flex-1 flex-col bg-222 max-h-[80vh] rounded-lg pl-6 pt-4 pr-6 md:pl-10 md:pt-6 md:pr-10 items-center text-white overflow-scroll">
+                    {
+                        user.Playlists.map((playlist) =>
+                            <PlaylistsPrev playlist={playlist} />
+                        )
+                    }
+                    <button className="hover:bg-gray28 p-2 transition-all rounded-md flex items-center justify-center" onClick={() => handleClick()}>
+                        <FontAwesomeIcon icon={faPlusCircle} className="size-6" />
+                    </button>
                 </div>
-                <div className={`flex ${user ? "w-fit" : "w-full"} xl:h-full flex-col justify-center gap-10`}>
-                    <Top type="month" from="tracks" />
-                    <Top type="month" from="albums" />
-                    <Top type="month" from="artists" />
-                </div>
+            ) : (
+                <span></span>
+            )
+        }
+        <div className={`flex flex-3 bg-222 rounded-lg w-full max-h-[80vh] ${user ? "sm xxl:columns-2" : "columns-2"} col text-white gap-2 p-4 xxl:p-10 transition-all tsm  overflow-scroll scrollbar-hidden`}>
+            <div className={`flex ${user ? "w-fit" : "w-full"} xl:h-full flex-col justify-center gap-10`}>
+                <Top type="week" from="tracks" />
+                <Top type="week" from="albums" />
+                <Top type="week" from="artists" />
             </div>
-            {
-                currentTrack ? (
-                    <section className="flex-2 xl:h-full w-full flex-col justify-center gap-10 bg-222 rounded-lg text-white h-9/10">
-                        <MainPlayer />
-                    </section>
-                ) : (
-                    <span></span>
-                )
-            }
-        </main>
+            <div className={`flex ${user ? "w-fit" : "w-full"} xl:h-full flex-col justify-center gap-10`}>
+                <Top type="month" from="tracks" />
+                <Top type="month" from="albums" />
+                <Top type="month" from="artists" />
+            </div>
+        </div>
         {
             isCreating ? (
                 <>

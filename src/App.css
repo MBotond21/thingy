@@ -242,6 +242,38 @@ input[type="range"].vert::-ms-thumb {
     animation: volumeBgAnim 700ms ease-in-out;
 }
 
+.like-anim{
+    animation: like 500ms ease-in-out;
+}
+
+.scroll:hover p {
+    animation: scrollText 5s linear infinite;
+}
+
+@keyframes like {
+    0%{
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+    50%{
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+    100%{
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+}
+
+@keyframes scrollText {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
 .g:hover::before{
     content: "";
     position: absolute;

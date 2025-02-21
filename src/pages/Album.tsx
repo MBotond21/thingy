@@ -29,8 +29,8 @@ export default function AlbumView() {
         return storedSections
             ? JSON.parse(storedSections)
             : [
-                { id: 1, type: "info", className: `${active == "info"? "flex": "hidden"} flex-2 lg:flex xl:h-full flex-col gap-10 bg-222 rounded-lg overflow-hidden` },
-                { id: 2, type: "mainPlayer", className: `flex-1 ${active == "music"? "flex": "hidden"} xl:h-full w-full flex-col justify-center gap-10 bg-222 rounded-lg` },
+                { id: 1, type: "info", className: `${active == "info" ? "flex" : "hidden"} flex-2 lg:flex xl:max-h-[80vh] flex-col gap-10 bg-222 rounded-lg overflow-hidden` },
+                { id: 2, type: "mainPlayer", className: `flex-1 ${active == "music" ? "flex" : "hidden"} xl:max-h-[80vh] w-full flex-col justify-center gap-10 bg-222 rounded-lg` },
             ];
     });
 
@@ -41,7 +41,7 @@ export default function AlbumView() {
     // }, [album]);
 
     useEffect(() => {
-        if(id) loadAlbum(id);
+        if (id) loadAlbum(id);
     }, [])
 
     useEffect(() => {
@@ -65,10 +65,9 @@ export default function AlbumView() {
     }
 
     return <>
-        <Header />
         {
             album ? (
-                <main className="flex flex-row h-5/6 w-full text-white gap-2 p-4 transition-all">
+                <>
                     {
                         sections.map((section, index) => (
                             <DraggableItem key={section.id} id={section.id} index={index} moveItem={moveItem} className={section.className} >
@@ -77,10 +76,10 @@ export default function AlbumView() {
                         ))
                     }
                     <div className="flex lg:hidden absolute left-0 bottom-12 gap-7 w-full items-center justify-center">
-                        <button className="size-10 rounded-lg bg-white text-gray222 hover:bg-gray-200 disabled:bg-gray-300" onClick={() => handleViewChange("info")}  disabled={active === "info"} ><FontAwesomeIcon icon={faInfo}/></button>
-                        <button className="size-10 rounded-lg bg-white text-gray222 hover:bg-gray-200 disabled:bg-gray-300" onClick={() => handleViewChange("music")} disabled={active === "music"} ><FontAwesomeIcon icon={faMusic}/></button>
+                        <button className="size-10 rounded-lg bg-white text-gray222 hover:bg-gray-200 disabled:bg-gray-300" onClick={() => handleViewChange("info")} disabled={active === "info"} ><FontAwesomeIcon icon={faInfo} /></button>
+                        <button className="size-10 rounded-lg bg-white text-gray222 hover:bg-gray-200 disabled:bg-gray-300" onClick={() => handleViewChange("music")} disabled={active === "music"} ><FontAwesomeIcon icon={faMusic} /></button>
                     </div>
-                </main>
+                </>
             ) : (
                 <div className="w-full h-4/5 flex items-center justify-center">
                     <svg aria-hidden="true" className="w-16 h-16 text-gray-200 animate-spin dark:text-gray-600 fill-yellow-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">

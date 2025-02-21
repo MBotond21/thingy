@@ -23,6 +23,8 @@ export default function MainPlayer() {
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
     const [playlistIds, setPlaylistIds] = useState<number[]>([]);
 
+    const [liked, setLiked] = useState<boolean>(false);
+
     const setCurrentTrack = setCurrentTrackFR;
     const navigate = useNavigate();
 
@@ -44,7 +46,7 @@ export default function MainPlayer() {
         if (queue.length > 0 && !currentTrack) {
             console.log("Mainplayer");
             setCurrentTrack(queue[0]);
-        } 
+        }
         if (queue.length == 1) {
             console.log("Mainplayer");
             setCurrentTrack(queue[0]);
@@ -87,6 +89,10 @@ export default function MainPlayer() {
             setCurrentTime(0);
         }
     }
+
+    useEffect(() => {
+        if (currentTrack) setLiked(isLiked(+currentTrack.id));
+    }, [currentTrack])
 
     useEffect(() => {
         stepTrack();
@@ -197,8 +203,8 @@ export default function MainPlayer() {
     }
 
     const handleChange = (id: number) => {
-        setPlaylistIds((prev) => 
-            prev.includes(id)? prev.filter((i) => i !== id): [...prev, id]
+        setPlaylistIds((prev) =>
+            prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
         );
     }
 
@@ -208,10 +214,22 @@ export default function MainPlayer() {
         setDialogOpen(false);
     }
 
+    const handleLikeCliked = () => {
+        like(currentTrack?.id!);
+        setLiked(isLiked(+currentTrack?.id!));
+        document.getElementById('like_btn')?.classList.add("like-anim");
+        setTimeout(() => {
+            document.getElementById('like_btn')?.classList.remove("like-anim");
+        }, 600);
+    }
+
     return <>
         <div className="content">
             <img src={currentTrack?.image} alt="trackPic" className="hover:cursor-default track size-52 md:size-72" />
-            <p className="text-xl md:text-2xl mt-1 hover:cursor-default w-2/4 text-center"><b className="hover:cursor-pointer hover:underline" onClick={() => handleClick(currentTrack)}>{currentTrack?.artist_name}</b> - {currentTrack?.name}</p>
+            <p className="text-xl md:text-2xl w-fit text-center inline-block"><b className="hover:cursor-pointer hover:underline" onClick={() => handleClick(currentTrack)}>{currentTrack?.artist_name}</b></p>
+            <div className="mt-1 mr-auto ml-auto w-2/4 overflow-hidden whitespace-nowrap scroll">                
+                <p className="text-xl md:text-2xl w-fit text-center inline-block">{currentTrack?.name}</p>
+            </div>
             <div className="w-full m-4">
                 <audio ref={audioRef} className="w-3/4 ml-f-3/4 hover:cursor-default">
                     <source src={currentTrack?.audio} type="audio/mpeg" />
@@ -221,7 +239,7 @@ export default function MainPlayer() {
                         {
                             user ? (
                                 <button className="size-5">
-                                    <FontAwesomeIcon icon={isLiked(+currentTrack?.id!) ? faHeartCircleMinus : faHeartCirclePlus} className={`size-5 ${isLiked(+currentTrack?.id!) ? "text-pink-300" : ""}`} onClick={() => like(currentTrack?.id!)} />
+                                    <FontAwesomeIcon icon={isLiked(+currentTrack?.id!) ? faHeartCircleMinus : faHeartCirclePlus} className={`size-5 ${isLiked(+currentTrack?.id!) ? "text-pink-300" : ""}`} id="like_btn" onClick={() => handleLikeCliked()} />
                                 </button>
                             ) : (
                                 <span></span>

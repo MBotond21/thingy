@@ -21,42 +21,30 @@ export default function Artist() {
     }
 
     return <>
-        <Header />
         {
             artist ? (
-                <main className="flex flex-2 flex-row h-5/6 w-full text-white gap-2 p-4 transition-all">
-                    <section className="flex-2 flex xl:h-full flex-col gap-10 bg-222 rounded-lg p-8 overflow-hidden">
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <img src={artist?.image} alt="albumPic" className="size-64 md:size-72 object-cover" />
-                            <div className="flex flex-col">
-                                <h1 className="text-4xl font-semibold">{artist?.name}</h1>
-                                <p className="text-xl">
-                                    {artist?.name}, {artist?.albums?.length}{" "}
-                                    {artist?.albums?.length === 1 ? "album" : "albums"},{" "}
-                                </p>
-                            </div>
+                <section className="flex-2 flex xl:max-h-[80vh] flex-col gap-10 bg-222 rounded-lg p-8 overflow-hidden">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <img src={artist?.image} alt="albumPic" className="size-64 md:size-72 object-cover" />
+                        <div className="flex flex-col">
+                            <h1 className="text-4xl font-semibold">{artist?.name}</h1>
+                            <p className="text-xl">
+                                {artist?.name}, {artist?.albums?.length}{" "}
+                                {artist?.albums?.length === 1 ? "album" : "albums"},{" "}
+                            </p>
                         </div>
-                        <div className="flex flex-row gap-10 overflow-scroll scrollbar-hidden mt-auto">
-                            {artist?.albums?.map((album) => (
-                                <div key={album.id} className="flex flex-col items-center">
-                                    <div className="w-32 h-32 flex-shrink-0">
-                                        <img src={album.image} alt="track" className="w-full h-full object-contain hover:cursor-pointer" onClick={() => handleClick(album)} />
-                                    </div>
-                                    <p className="overflow-hidden h-12 text-center">{album.name}</p>
+                    </div>
+                    <div className="flex flex-row gap-10 overflow-scroll scrollbar-hidden mt-auto">
+                        {artist?.albums?.map((album) => (
+                            <div key={album.id} className="flex flex-col items-center">
+                                <div className="w-32 h-32 flex-shrink-0">
+                                    <img src={album.image} alt="track" className="w-full h-full object-contain hover:cursor-pointer" onClick={() => handleClick(album)} />
                                 </div>
-                            ))}
-                        </div>
-                    </section>
-                    {
-                        currentTrack ? (
-                            <section className="flex-1 xl:h-full w-full flex-col justify-center gap-10 bg-222 rounded-lg">
-                                <MainPlayer />
-                            </section>
-                        ) : (
-                            <span></span>
-                        )
-                    }
-                </main>
+                                <p className="overflow-hidden h-12 text-center">{album.name}</p>
+                            </div>
+                        ))}
+                    </div>
+                </section>
             ) : (
                 <div className="w-full h-4/5 flex items-center justify-center">
                     <svg aria-hidden="true" className="w-16 h-16 text-gray-200 animate-spin dark:text-gray-600 fill-yellow-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">

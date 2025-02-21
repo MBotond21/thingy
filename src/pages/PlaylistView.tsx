@@ -33,23 +33,12 @@ export default function PlaylistView() {
     }, [playlist, isLoading]);
 
     return <>
-        <Header />
-        <main className="flex flex-row h-5/6 w-full text-white gap-2 p-4 transition-all">
-            {
+        {
                 playlist ? (
                     <>
-                        <section className="hidden flex-2 lg:flex xl:h-full flex-col gap-10 bg-222 rounded-lg overflow-hidden p-8">
+                        <section className="hidden flex-2 lg:flex xl:max-h-[80vh] flex-col gap-10 bg-222 rounded-lg overflow-hidden p-8">
                             <PlaylistInfo playlist={playlist} />
                         </section>
-                        {
-                            currentTrack? (
-                                <section className="flex-1 xl:h-full w-full flex-col justify-center gap-10 bg-222 rounded-lg">
-                                    <MainPlayer />
-                                </section>
-                            ):( 
-                                <span></span>
-                            )
-                        }
                     </>
                 ) : (
                     <div className="w-full h-4/5 flex items-center justify-center">
@@ -60,6 +49,5 @@ export default function PlaylistView() {
                     </div>
                 )
             }
-        </main>
     </>
 }
