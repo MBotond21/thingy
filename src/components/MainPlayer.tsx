@@ -1,10 +1,13 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { TrackContext } from "../contexts/MusicContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlay, faPause, faForwardStep, faBackwardStep, faVolumeMute, faVolumeLow, faVolumeHigh, faHeartCirclePlus, faHeartCircleMinus, faCirclePlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlay, faPause, faForwardStep, faBackwardStep, faVolumeMute, faVolumeLow, faVolumeHigh, faHeartCirclePlus, faHeartCircleMinus, faCirclePlus, faBars, faShuffle } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router";
 import { AuthContext } from "../contexts/AuthContext";
 import { CreateDialogv2 } from "./CreateDialogv2";
+import ScrollingText from "./ScrollinText";
+import TrackPrev from "./TrackPrev";
+import { Track } from "../track";
 
 export default function MainPlayer() {
     const { queue, currentTrack, setCurrentTrackFR, loadArtist } = useContext(TrackContext);
@@ -25,31 +28,21 @@ export default function MainPlayer() {
 
     const [liked, setLiked] = useState<boolean>(false);
 
+    const [queueOpen, setQueueOpen] = useState<boolean>(false);
+    const [shuffle, setShuffle] = useState<boolean>(false);
+
+    const [actQueue, setActQueue] = useState<Track[]>(queue);
+
     const setCurrentTrack = setCurrentTrackFR;
     const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     if (queue.length > 0 && !currentTrack) {
-    //         setCurrentTrack(queue[0]);
-    //     } else if (queue.length == 1) {
-    //         setCurrentTrack(queue[0]);
-    //     }
-    // }, [queue]);
-
-    useEffect(() => {
-        console.log("queue: ", queue);
-        console.log(`The current track is set to: `, currentTrack);
-    }, [currentTrack]);
-
     useEffect(() => {
 
-        if (queue.length > 0 && !currentTrack) {
-            console.log("Mainplayer");
-            setCurrentTrack(queue[0]);
+        if (actQueue.length > 0 && !currentTrack) {
+            setCurrentTrack(actQueue[0]);
         }
-        if (queue.length == 1) {
-            console.log("Mainplayer");
-            setCurrentTrack(queue[0]);
+        if (actQueue.length == 1) {
+            setCurrentTrack(actQueue[0]);
         }
 
         const audio = audioRef.current;
@@ -80,23 +73,19 @@ export default function MainPlayer() {
     }, []);
 
     const stepTrack = () => {
-        if (currentTime == duration) {
-            if (queue.indexOf(currentTrack!) != queue.length - 1) {
-                setCurrentTrack(queue[queue.indexOf(currentTrack!) + 1]);
+        if (currentTime >= duration && duration > 0) { 
+            if (actQueue.indexOf(currentTrack!) !== actQueue.length - 1) {
+                setCurrentTrack(actQueue[actQueue.indexOf(currentTrack!) + 1]);
             } else {
-                setCurrentTrack(queue[0]);
+                setCurrentTrack(actQueue[0]);
             }
             setCurrentTime(0);
         }
-    }
-
-    useEffect(() => {
-        if (currentTrack) setLiked(isLiked(+currentTrack.id));
-    }, [currentTrack])
+    };    
 
     useEffect(() => {
         stepTrack();
-    }, [currentTime])
+    }, [currentTime]);
 
     useEffect(() => {
         if (!audioRef.current || !currentTrack?.audio) return;
@@ -170,22 +159,21 @@ export default function MainPlayer() {
 
     const handleStep = (n: number) => {
 
-        if (queue.indexOf(currentTrack!) == 0 && n < 0) {
+        if (actQueue.indexOf(currentTrack!) == 0 && n < 0) {
             audioRef.current?.pause();
             setCurrentTime(0);
             audioRef.current!.currentTime = 0;
-        } else if (queue.indexOf(currentTrack!) == queue.length - 1) {
-            setCurrentTrack(queue[0]);
+        } else if (actQueue.indexOf(currentTrack!) == actQueue.length - 1 && n > 0) {
+            setCurrentTrack(actQueue[0]);
         } else {
-            let temp = queue.indexOf(currentTrack!) + n;
-            setCurrentTrack(queue[temp]);
+            let temp = actQueue.indexOf(currentTrack!) + n;
+            setCurrentTrack(actQueue[temp]);
         }
         setCurrentTime(0);
     }
 
     const handleClick = async (data: any) => {
-        loadArtist(data.artist_id);
-        navigate("/artistView");
+        navigate(`/artistView/${data.artist_id}`);
     }
 
     const isLiked = (id: number) => {
@@ -223,27 +211,45 @@ export default function MainPlayer() {
         }, 600);
     }
 
+    function shuffleArray(array: Track[]): Track[] {
+        const shuffled = [...array].filter(track => track !== currentTrack);
+        const history = array.slice(0, array.indexOf(currentTrack!) + 1);
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return [...history, ...shuffled];
+    }
+
+    useEffect(() => {
+        if (shuffle) {
+            setActQueue(prevQueue => shuffleArray([...prevQueue]));
+        } else {
+            setActQueue(queue);
+        }
+    }, [shuffle, queue]);
+
+    const handleRemove = (track: Track) => {
+        const nQueue = [...actQueue].filter((t) => t !== track);
+        setActQueue([...nQueue]);
+    }
+
+
     return <>
-        <div className="content">
+        <div className={`flex-col justify-center items-center w-full h-full ${queueOpen ? "hidden" : "flex"}`}>
             <img src={currentTrack?.image} alt="trackPic" className="hover:cursor-default track size-52 md:size-72" />
             <p className="text-xl md:text-2xl w-fit text-center inline-block"><b className="hover:cursor-pointer hover:underline" onClick={() => handleClick(currentTrack)}>{currentTrack?.artist_name}</b></p>
-            <div className="mt-1 mr-auto ml-auto w-2/4 overflow-hidden whitespace-nowrap scroll">                
-                <p className="text-xl md:text-2xl w-fit text-center inline-block">{currentTrack?.name}</p>
-            </div>
+            <ScrollingText text={currentTrack!.name} className="mt-1 mr-auto ml-auto w-2/4 text-xl md:text-2xl" trigger={[currentTrack]} />
             <div className="w-full m-4">
                 <audio ref={audioRef} className="w-3/4 ml-f-3/4 hover:cursor-default">
                     <source src={currentTrack?.audio} type="audio/mpeg" />
                 </audio>
-                <div className="w-3/4 ml-f-3/4 inline h-6">
+                <div className="w-3/4 ml-f-3/4 inline h-6 mt-auto">
                     <div className="flex items-center justify-center gap-10">
                         {
-                            user ? (
-                                <button className="size-5">
-                                    <FontAwesomeIcon icon={isLiked(+currentTrack?.id!) ? faHeartCircleMinus : faHeartCirclePlus} className={`size-5 ${isLiked(+currentTrack?.id!) ? "text-pink-300" : ""}`} id="like_btn" onClick={() => handleLikeCliked()} />
-                                </button>
-                            ) : (
-                                <span></span>
-                            )
+                            user && <button className="size-5">
+                                <FontAwesomeIcon icon={liked ? faHeartCircleMinus : faHeartCirclePlus} className={`size-5 ${liked ? "text-yellow-300" : "text-white"}`} id="like_btn" onClick={() => handleLikeCliked()} />
+                            </button>
                         }
                         <button className="size-5" onClick={() => handleStep(-1)}>
                             <FontAwesomeIcon icon={faBackwardStep} className="size-5" />
@@ -259,16 +265,12 @@ export default function MainPlayer() {
                             <FontAwesomeIcon icon={faForwardStep} className="size-5" />
                         </button>
                         {
-                            user ? (
-                                <button className="size-5">
-                                    <FontAwesomeIcon icon={faCirclePlus} className="size-5" onClick={() => setDialogOpen(true)} />
-                                </button>
-                            ) : (
-                                <span></span>
-                            )
+                            user && <button className="size-5">
+                                <FontAwesomeIcon icon={faCirclePlus} className="size-5" onClick={() => setDialogOpen(true)} />
+                            </button>
                         }
                     </div>
-                    <div className="flex felx-row items-center justify-center">
+                    <div className="flex felx-row items-center justify-center mb-auto">
                         <div className="flex items-center justify-center gap-2 mr-1">
                             <span id="current-time" className="w-8">{formatTime(currentTime)}</span>
                             <input
@@ -296,8 +298,22 @@ export default function MainPlayer() {
                             <input type="range" className="vert absolute bottom-3/4 mb-2 hidden group-hover:flex hover:flex w-24 m-8 transition ease-in-out duration-700" value={audioRef.current?.volume} min={0} max={1} step={0.05} onChange={handleVolume} />
                         </div>
                     </div>
+
                 </div>
             </div>
+        </div>
+
+        <div className={`flex-col items-center w-full h-9/10 overflow-scroll p-4 ${queueOpen ? "flex" : "hidden"}`}>
+            {
+                actQueue.slice(actQueue.indexOf(currentTrack!)).map((track, i) =>
+                    <TrackPrev track={track} isFirst={i == 0} add={() => setDialogOpen(true)} remove={() => handleRemove(track)} />
+                )
+            }
+        </div>
+
+        <div className="flex flex-row w-full h-1/5 md:h-1/10 justify-center items-center gap-4">
+            <button><FontAwesomeIcon icon={faBars} className={`size-5 ${queueOpen ? "text-yellow-400" : "text-white"}`} onClick={() => setQueueOpen(!queueOpen)} /></button>
+            <button><FontAwesomeIcon icon={faShuffle} className={`size-5 ${shuffle ? "text-yellow-400" : "text-white"}`} onClick={() => setShuffle(!shuffle)} /></button>
         </div>
 
         {

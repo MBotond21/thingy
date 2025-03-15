@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useEffect, useState } from "react";
 import { User } from "../user";
 import { Playlist } from "../playlist";
 
@@ -15,6 +15,9 @@ interface AuthContextState {
     getUser: (id: number) => Promise<Object | undefined>;
     streamPic: (pic: File) => void;
     addToPlaylist: (trackId: string[], playlistId: number[]) => void;
+    search: (term: string) => void;
+    autoComplete: Record<string, any[]> | undefined;
+    setAutoComplete: Dispatch<SetStateAction<Record<string, any[]> | undefined>>;
 }
 
 export const AuthContext = createContext<AuthContextState>({
@@ -30,11 +33,16 @@ export const AuthContext = createContext<AuthContextState>({
     getUser: async () => undefined,
     streamPic: () => { },
     addToPlaylist: () => { },
+    search: () => { },
+    autoComplete: undefined,
+    setAutoComplete: () => { },
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string>("");
+    const [refresh, setRefresh] = useState<string>("");
+    const [autoComplete, setAutoComplete] = useState<Record<string, any[]>>();
 
     useEffect(() => {
         const accessToken = localStorage.getItem("accessToken");
@@ -45,16 +53,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
             const formData = new FormData();
             formData.append("file", file);
-    
+
             const response = await fetch(`http://localhost:3000/users/pic/${user?.Id}`, {
                 method: "PATCH",
+                headers: {
+                    Authorization: `Bearer ${token || localStorage.getItem("accessToken")}`,
+                },
                 body: formData,
             });
-    
+
             if (!response.ok) throw new Error("Upload failed");
-    
+
             const data = await response.json();
-            
+
             setUser({
                 Id: data.UserID,
                 Email: data.Email,
@@ -104,7 +115,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             const data = await response.json();
             setToken(data.accessToken);
+            setRefresh(data.refreshToken);
             localStorage.setItem("accessToken", data.accessToken);
+            localStorage.setItem("refresh", data.refreshToken);
             return undefined;
 
         } catch (e: any) {
@@ -132,7 +145,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
 
             const data = await response.json();
-            console.log(data);
 
         } catch (e: any) {
             console.log(e.message);
@@ -163,14 +175,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const createPlaylist = async (PlaylistName: string, Private: boolean, Description?: string, PlaylistCover?: File) => {
         try {
-            // const PlaylistCover = pic ? Array.from(new Uint8Array(pic)) : undefined;
             const f = new FormData();
             f.append("PlaylistName", PlaylistName);
-            if(PlaylistCover) f.append("PlaylistCover", PlaylistCover);
-            if(Description) f.append("Description", Description);
+            if (PlaylistCover) f.append("PlaylistCover", PlaylistCover);
+            if (Description) f.append("Description", Description);
             f.append("Private", Private.toString());
-            const response = await fetch(`http://localhost:3000/playlists?owner=${user?.Id}`, {
+            const response = await fetch(`http://localhost:3000/playlists`, {
                 method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token || localStorage.getItem("accessToken")}`,
+                },
                 body: f,
             });
 
@@ -189,7 +203,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             user?.Playlists.push(nData);
 
         } catch (e: any) {
-            console.log(PlaylistCover?.size)
             alert(e.message);
         }
     }
@@ -242,6 +255,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }
 
+    const updatePlaylist = async (PlaylistId: number, PlaylistName?: string, Description?: string, PlaylistCover?: File) => {
+        try {
+            const f = new FormData();
+            if (PlaylistName) f.append("PlaylistName", PlaylistName);
+            if (Description) f.append("Description", Description);
+            if (PlaylistCover) f.append("PlaylistCover", PlaylistCover);
+
+            const response = await fetch(`http://localhost:3000/playlists/${PlaylistId}`, {
+                method: 'PATCH',
+                headers: {
+                    Authorization: `Bearer ${token || localStorage.getItem("accessToken")}`,
+                },
+                body: f,
+            });
+
+            if (!response.ok) {
+                const e = await response.json();
+                throw new Error(e.message);
+            }
+
+            const data = await response.json();
+
+            const nData = {
+                ...data,
+                PlaylistCover: data.PlaylistCover ? new Blob([new Uint8Array(data.PlaylistCover.data)], { type: "image/png" }) : null
+            }
+
+            user!.Playlists = user!.Playlists.map((o) => o.PlaylistID == nData.PlaylistID? nData: o);
+
+        }catch(e: any) {
+            alert(e.message);
+        }
+    }
+
     const profile = async () => {
         try {
             const response = await fetch("http://localhost:3000/auth/profile", {
@@ -270,9 +317,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             });
 
         } catch (e: any) {
-            console.log(e.message);
-            setUser(null);
-            localStorage.removeItem("authToken");
+            try {
+                const response = await fetch("http://localhost:3000/auth/refresh", {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${refresh || localStorage.getItem("refresh")}`,
+                    },
+                });
+
+                if (!response.ok) throw new Error("Unable to validate user");
+
+                const data = await response.json();
+
+                setToken(data.accessToken);
+                setToken(data.refreshToken);
+
+                profile();
+
+            } catch (e: any) {
+                setUser(null);
+                localStorage.removeItem("authToken");
+                localStorage.removeItem("refresh");
+            }
         }
     }
 
@@ -298,7 +364,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (!response.ok) throw new Error("Unable to validate user");
 
             const data = await response.json();
-            console.log(data);
 
             // const p = await getPfp(data.UserID);
 
@@ -310,7 +375,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 Description: data.Description,
                 Playlists: data.Playlists
             });
-            console.log("Profile updated successfully");
         } catch (e: any) {
             console.error(e.message);
         }
@@ -337,8 +401,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
 
             const data = await response.json();
-            
-            console.log(data);
 
             return data;
 
@@ -348,8 +410,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }
 
+    const search = async (term: string) => {
+        console.log("searching " + term);
+        setAutoComplete(undefined);
+        const response = await fetch(
+            `http://localhost:3000/search?term=${term}&userId=${user?.Id}`
+        );
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+
+        setAutoComplete(data);
+    }
+
     return (
-        <AuthContext.Provider value={{ user, reg, login, profile, update, logout, like, getPlaylist, createPlaylist, getUser, streamPic, addToPlaylist }}>
+        <AuthContext.Provider value={{ user, reg, login, profile, update, logout, like, getPlaylist, createPlaylist, getUser, streamPic, addToPlaylist, search, autoComplete, setAutoComplete }}>
             {children}
         </AuthContext.Provider>
     );

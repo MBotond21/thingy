@@ -1,14 +1,8 @@
 import { useContext, useEffect, useState } from "react";
-import Header from "../components/Header";
 import { TrackContext } from "../contexts/MusicContext";
-import MainPlayer from "../components/MainPlayer";
-import { DraggableItem } from "../components/DraggableItem";
 import AlbumInfo from "../components/AlbumInfo";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faInfo, faMusic } from "@fortawesome/free-solid-svg-icons";
 import { useParams } from "react-router";
-
-const ITEM_TYPE = 'SECTION';
+import { AuthContext } from "../contexts/AuthContext";
 
 interface Section {
     id: number;
@@ -18,27 +12,21 @@ interface Section {
 
 const componentMap: Record<string, React.ReactNode> = {
     info: <AlbumInfo />,
-    mainPlayer: <MainPlayer />,
 };
 
 export default function AlbumView() {
-    const { album, queue, setQueue, active, setActive, loadAlbum } = useContext(TrackContext);
+    const { album, active, loadAlbum } = useContext(TrackContext);
+    const { user } = useContext(AuthContext)
     const { id } = useParams();
     const [sections, setSections] = useState<Section[]>(() => {
         const storedSections = localStorage.getItem("sections");
         return storedSections
             ? JSON.parse(storedSections)
             : [
-                { id: 1, type: "info", className: `${active == "info" ? "flex" : "hidden"} flex-2 lg:flex xl:max-h-[80vh] flex-col gap-10 bg-222 rounded-lg overflow-hidden` },
-                { id: 2, type: "mainPlayer", className: `flex-1 ${active == "music" ? "flex" : "hidden"} xl:max-h-[80vh] w-full flex-col justify-center gap-10 bg-222 rounded-lg` },
+                { id: 1, type: "info", className: `${active == "info" ? "flex" : "hidden"} flex-3 lg:flex xl:max-h-[80vh] flex-col gap-10 bg-222 rounded-lg overflow-hidden` },
+                //other sections
             ];
     });
-
-    // useEffect(() => {
-    //     if (album) {
-    //         setQueue(album.tracks!);
-    //     }
-    // }, [album]);
 
     useEffect(() => {
         if (id) loadAlbum(id);
@@ -55,29 +43,12 @@ export default function AlbumView() {
         setSections(updatedSections);
     };
 
-    const handleViewChange = (type: "info" | "music") => {
-        setActive(type);
-        const aiElement = document.getElementsByTagName('section')[0];
-        const mpElement = document.getElementsByTagName('section')[1];
-
-        if (aiElement) aiElement.style.display = type == "info" ? "flex" : "none";
-        if (mpElement) mpElement.style.display = type == "music" ? "flex" : "none";
-    }
-
     return <>
         {
             album ? (
                 <>
-                    {
-                        sections.map((section, index) => (
-                            <DraggableItem key={section.id} id={section.id} index={index} moveItem={moveItem} className={section.className} >
-                                {componentMap[section.type]}
-                            </DraggableItem>
-                        ))
-                    }
-                    <div className="flex lg:hidden absolute left-0 bottom-12 gap-7 w-full items-center justify-center">
-                        <button className="size-10 rounded-lg bg-white text-gray222 hover:bg-gray-200 disabled:bg-gray-300" onClick={() => handleViewChange("info")} disabled={active === "info"} ><FontAwesomeIcon icon={faInfo} /></button>
-                        <button className="size-10 rounded-lg bg-white text-gray222 hover:bg-gray-200 disabled:bg-gray-300" onClick={() => handleViewChange("music")} disabled={active === "music"} ><FontAwesomeIcon icon={faMusic} /></button>
+                    <div className={`${active == "info" ? "flex" : "hidden lg:flex"} ${user? "flex-3": "flex-4"} lg:flex h-[75vh] md:h-[80vh] flex-col pt-8 pr-8 pl-8 gap-10 bg-222 rounded-lg overflow-hidden`}>
+                        <AlbumInfo/>
                     </div>
                 </>
             ) : (

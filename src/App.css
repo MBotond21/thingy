@@ -107,15 +107,6 @@ main{
     height: 90%;
     gap: 1rem;
 }
-
-.content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-  }
   
   img.track {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -207,7 +198,6 @@ input[type="range"].vert::-ms-thumb {
   
   @media screen and (max-width: 1280px) {
     .tsm {
-        display: flex;
         flex-direction: column;
     }
 }
@@ -215,7 +205,7 @@ input[type="range"].vert::-ms-thumb {
 @media screen and (max-width: 1920px) {
     .sm {
         flex-direction: column;
-        width: fit-content;
+        width: 100%;
         align-items: center;
     }
 }
@@ -247,7 +237,7 @@ input[type="range"].vert::-ms-thumb {
 }
 
 .scroll:hover p {
-    animation: scrollText 5s linear infinite;
+    animation: scrollText 3.5s linear infinite alternate;
 }
 
 @keyframes like {
@@ -270,7 +260,7 @@ input[type="range"].vert::-ms-thumb {
       transform: translateX(0);
     }
     to {
-      transform: translateX(-100%);
+      transform: translateX(-50%);
     }
   }
 
@@ -297,3 +287,14 @@ input[type="range"].vert::-ms-thumb {
   .overflow-scroll {
     overflow: auto;
   }  
+
+
+  .miafasz{
+    position: absolute;
+    background-color: red;
+    width: 100%;
+    height: 3rem;
+    z-index: 999;
+    bottom: 0;
+    left: 0;
+  }

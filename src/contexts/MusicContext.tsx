@@ -1,4 +1,4 @@
-import { createContext, useEffect, useRef, useState } from "react";
+import { createContext, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Track } from "../track";
 import { Album } from "../album";
 import { Artist } from "../artist";
@@ -7,9 +7,9 @@ interface TrackContextState {
     track: Track | null;
     album: Album | undefined;
     artist: Artist | undefined;
-    active: "info" | "music";
+    active: "info" | "music" | "playlist";
     loadTrack: (id: string) => void;
-    setActive: (active: "info" | "music") => void;
+    setActive: (active: "info" | "music" | "playlist") => void;
     loadAlbum: (id: string) => void;
     loadArtist: (id: string) => void;
     loadTopTracks: (type: string) => void;
@@ -26,8 +26,8 @@ interface TrackContextState {
     currentTrack: Track | undefined;
     setCurrentTrackFR: (track: Track | undefined) => void;
     search: (term: string) => void;
-    autoComplete: string[];
-    setAutoComplete: (autoComplete: string[]) => void;
+    autoComplete: Record<string, string[]> | undefined;
+    setAutoComplete: Dispatch<SetStateAction<Record<string, string[]> | undefined>>;
 }
 
 interface CacheEntry<T> {
@@ -61,7 +61,7 @@ export const TrackContext = createContext<TrackContextState>({
     currentTrack: undefined,
     setCurrentTrackFR: () => { },
     search: () => { },
-    autoComplete: [],
+    autoComplete: undefined,
     setAutoComplete: () => { },
 });
 
@@ -69,7 +69,7 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const [track, setTrack] = useState<Track | null>(null);
     const [album, setAlbum] = useState<Album>();
     const [artist, setArtist] = useState<Artist>();
-    const [active, setActive] = useState<"info" | "music">("music");
+    const [active, setActive] = useState<"info" | "music" | "playlist">("music");
     const [queue, setQueue] = useState<Track[]>([]);
 
     const [wtracks, setwTracks] = useState<Track[]>([]);
@@ -83,18 +83,14 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const [currentTrack, setCurrentTrack] = useState<Track>();
 
-    const [autoComplete, setAutoComplete] = useState<string[]>([]);
+    const [autoComplete, setAutoComplete] = useState<Record<string, string[]>>();
     const isCurrentlySetting = useRef(false);
 
     const client_id = "8b1de417";
 
-    // useEffect(() => {
-    //     const load = async () => {
-    //         const album = await loadAlbum();
-    //         console.log(album);
-    //     }
-    //     load();
-    // }, [])
+    useEffect(() => {
+        if(!currentTrack) setActive('info');
+    }, []);
 
     const toReadable = (text: string) => {
         const parser = new DOMParser();
@@ -231,11 +227,9 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (!id) {
             const ize = await localStorage.getItem("album");
             if (ize) setAlbum(JSON.parse(ize));
-            console.log("damn");
         }
         else {
             setAlbum(undefined);
-            console.log("loading...");
             await fetch(`https://api.jamendo.com/v3.0/albums/tracks/?client_id=${client_id}&format=jsonpretty&id=${id}`, {
                 method: 'GET',
             })
@@ -283,7 +277,6 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                     if (a.tracks) setQueue(a.tracks);
                     localStorage.setItem("album", JSON.stringify(a));
 
-                    console.log("loaded");
                 })
                 .catch((error) => {
                     console.log("An error occured while loading the album", error);
@@ -294,7 +287,6 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
 
     const loadArtist = async (id: string) => {
-        console.log("loading...");
         setArtist(undefined);
         await fetch(`https://api.jamendo.com/v3.0/artists/albums/?client_id=${client_id}&format=jsonpretty&id=${id}`, {
             method: 'GET',
@@ -340,8 +332,6 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 a.albums = processedAlbums;
 
                 setArtist(a);
-
-                console.log("loaded");
             })
             .catch((error) => {
                 console.log("An error occured while loading the album", error);
@@ -350,7 +340,6 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
 
     const loadTopTracks = async (type: string) => {
-        console.log("loading...");
         const key = `topTracks_${type}`;
 
         const fetchFunction = async () => {
@@ -382,12 +371,9 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         } else {
             setmTracks(data);
         }
-
-        console.log("loaded");
     }
 
     const loadTopAlbums = async (type: string) => {
-        console.log("loading...");
         const key = `topAlbums_${type}`;
 
         const fetchFunction = async () => {
@@ -429,12 +415,9 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         } else {
             setmAlbums(data);
         }
-
-        console.log("loaded");
     };
 
     const loadTopArtists = async (type: string) => {
-        console.log("loading...");
         const key = `topArtists_${type}`;
 
         const fetchFunction = async () => {
@@ -461,8 +444,6 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         } else {
             setmArtists(data);
         }
-
-        console.log("loaded");
     }
 
     const setCurrentTrackFR = async (track: Track | undefined) => {
@@ -474,12 +455,14 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         // setTimeout(() => {
         //     isCurrentlySetting.current = false;
         // }, 600);
-        setCurrentTrack(track);
+        console.log("something is setting the current track to: ", track);
+        
+        if(track) setCurrentTrack(track);
     };
 
     const search = async (term: string) => {
         console.log("searching " + term);
-        setAutoComplete([]);
+        setAutoComplete(undefined);
         const response = await fetch(
             `https://api.jamendo.com/v3.0/autocomplete/?client_id=${client_id}&format=jsonpretty&limit=3&prefix=${term}`
         );
@@ -488,17 +471,7 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
         const data = await response.json();
 
-        console.log(data);
-
-        const resultKeys = Object.keys(data.results);
-        resultKeys.forEach((key) => {
-            const items = data.results[key];
-            if (Array.isArray(items)) {
-                setAutoComplete((prevItem) => [...prevItem, ...items]);
-            }
-        });
-
-        console.log(autoComplete);
+        setAutoComplete(data.results);
     }
 
     return (

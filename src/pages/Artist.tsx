@@ -1,13 +1,14 @@
 import { useContext, useEffect } from "react";
-import Header from "../components/Header";
 import { TrackContext } from "../contexts/MusicContext";
 import { Album } from "../album";
 import { useNavigate, useParams } from "react-router";
-import MainPlayer from "../components/MainPlayer";
+import { AuthContext } from "../contexts/AuthContext";
+import ScrollingText from "../components/ScrollinText";
 
 export default function Artist() {
 
-    const { artist, loadArtist, currentTrack } = useContext(TrackContext);
+    const { artist, loadArtist, active } = useContext(TrackContext);
+    const { user } = useContext(AuthContext);
     const { id } = useParams();
 
     const navigate = useNavigate();
@@ -16,6 +17,10 @@ export default function Artist() {
         if (id) loadArtist(id);
     }, [])
 
+    useEffect(() => {
+        if (id) loadArtist(id);
+    }, [id])
+
     const handleClick = (data: Album) => {
         navigate(`/albumView/${data.id}`);
     }
@@ -23,7 +28,7 @@ export default function Artist() {
     return <>
         {
             artist ? (
-                <section className="flex-2 flex xl:max-h-[80vh] flex-col gap-10 bg-222 rounded-lg p-8 overflow-hidden">
+                <section className={`${user? "flex-3": "flex-4"} ${active == "info" ? "flex" : "hidden lg:flex"} xl:max-h-[80vh] flex-col gap-10 bg-222 rounded-lg p-8 overflow-hidden`}>
                     <div className="flex flex-col sm:flex-row gap-4">
                         <img src={artist?.image} alt="albumPic" className="size-64 md:size-72 object-cover" />
                         <div className="flex flex-col">
@@ -40,7 +45,7 @@ export default function Artist() {
                                 <div className="w-32 h-32 flex-shrink-0">
                                     <img src={album.image} alt="track" className="w-full h-full object-contain hover:cursor-pointer" onClick={() => handleClick(album)} />
                                 </div>
-                                <p className="overflow-hidden h-12 text-center">{album.name}</p>
+                                <ScrollingText text={album.name} className="w-24" trigger={album}/>
                             </div>
                         ))}
                     </div>

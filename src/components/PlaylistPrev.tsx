@@ -27,7 +27,7 @@ export default function PlaylistsPrev(props: Props){
     }
 
     return <>
-        <div className="flex flex-row gap-2 w-full text-white items-center hover:cursor-pointer rounded-md p-2 pr-8 hover:bg-gray28 hover:shadow-lg overflow-scroll" onClick={handleClick}>
+        <div className="flex flex-row gap-2 w-full text-white items-center hover:cursor-pointer rounded-md p-2 pr-8 hover:bg-gray28 hover:shadow-lg mt-8 -mb-8" onClick={handleClick}>
             <img src={pic} alt="playlistPic" className="size-14 rounded-sm" />
             <p>{props.playlist.PlaylistName}</p>
         </div>

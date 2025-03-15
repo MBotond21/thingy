@@ -3,14 +3,12 @@ import { useNavigate, useParams } from "react-router"
 import { Playlist } from "../playlist";
 import { AuthContext } from "../contexts/AuthContext";
 import PlaylistInfo from "../components/PlaylistInfo";
-import Header from "../components/Header";
 import { TrackContext } from "../contexts/MusicContext";
-import MainPlayer from "../components/MainPlayer";
 
 export default function PlaylistView() {
 
     const { id } = useParams();
-    const { currentTrack } = useContext(TrackContext);
+    const { active, setActive } = useContext(TrackContext);
     const { getPlaylist } = useContext(AuthContext);
     const [playlist, setIsPlaylist] = useState<Playlist | undefined>(undefined);
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -24,7 +22,19 @@ export default function PlaylistView() {
             setIsLoading(false);
         }
         load();
+        setActive("info");
     }, []);
+
+    useEffect(() => {
+        const load = async () => {
+            setIsLoading(true);
+            const p = await getPlaylist(+id!)
+            setIsPlaylist(p);
+            setIsLoading(false);
+        }
+        load();
+        setActive("info");
+    }, [id])
 
     useEffect(() => {
         if (!isLoading && !playlist) {
@@ -34,9 +44,9 @@ export default function PlaylistView() {
 
     return <>
         {
-                playlist ? (
+                !isLoading && playlist ? (
                     <>
-                        <section className="hidden flex-2 lg:flex xl:max-h-[80vh] flex-col gap-10 bg-222 rounded-lg overflow-hidden p-8">
+                        <section className={`${active == "info"? "flex": "hidden lg:flex"} flex-3 max-h-[75vh] md:max-h-[80vh] flex-col gap-10 bg-222 rounded-lg overflow-hidden p-8`}>
                             <PlaylistInfo playlist={playlist} />
                         </section>
                     </>

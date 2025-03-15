@@ -4,6 +4,7 @@ import { Track } from "../track";
 import { Album } from "../album";
 import { Artist } from "../artist";
 import { useNavigate } from "react-router";
+import ScrollingText from "./ScrollinText";
 
 interface Props {
     type: string;
@@ -14,7 +15,7 @@ export default function Top(props: Props) {
 
     const navigate = useNavigate();
 
-    const {loadAlbum, loadArtist, loadTopTracks, loadTopAlbums, loadTopArtists, wtracks, mtracks, walbums, malbums, wartists, martists, setQueue, setCurrentTrackFR, setActive } = useContext(TrackContext);
+    const { loadAlbum, loadArtist, loadTopTracks, loadTopAlbums, loadTopArtists, wtracks, mtracks, walbums, malbums, wartists, martists, setQueue, setCurrentTrackFR, setActive } = useContext(TrackContext);
 
     const dataMap: Record<string, any[]> = {
         weektracks: wtracks,
@@ -28,31 +29,31 @@ export default function Top(props: Props) {
     useEffect(() => {
         if (props.from == "tracks") {
             loadTopTracks(props.type);
-        } else if(props.from == "albums") {
+        } else if (props.from == "albums") {
             loadTopAlbums(props.type);
-        }else{
+        } else {
             loadTopArtists(props.type);
         }
     }, [])
 
     const handleClick = async (data: any) => {
-        if(props.from == "tracks"){
+        if (props.from == "tracks") {
             setQueue([]);
-            if(window.innerWidth < 1024){
+            if (window.innerWidth < 1024) {
                 setActive("music");
             }
             console.log("Top");
             setCurrentTrackFR(data as Track);
             navigate(`/albumView/${data.album_id}`);
         };
-        if(props.from == "albums"){
+        if (props.from == "albums") {
             setQueue([]);
-            if(window.innerWidth < 1024){
+            if (window.innerWidth < 1024) {
                 setActive("info");
             }
             navigate(`/albumView/${data.id}`);
         };
-        if(props.from == "artists"){
+        if (props.from == "artists") {
             navigate(`/artistView/${data.id}`);
         }
     }
@@ -63,9 +64,9 @@ export default function Top(props: Props) {
             <div className="flex flex-row gap-10 overflow-scroll scrollbar-hidden">
                 {
                     dataMap[props.type.concat(props.from)].map((data) => (
-                        <div className="flex flex-col">
+                        <div className="flex flex-col items-center" key={crypto.randomUUID()}>
                             <img src={data.image} alt="track" className="size-20 xxl:size-28 cursor-pointer" onClick={() => handleClick(data)} />
-                            <p className="overflow-hidden w-24 xxl:w-28 h-12 hover:cursor-default" title={data.name}>{data.name}</p>
+                            <ScrollingText text={data.name} className="mt-1 mr-auto ml-auto w-24 xxl:w-28" trigger={data} />
                         </div>
                     ))
                 }

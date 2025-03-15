@@ -5,10 +5,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router";
 import { AuthContext } from "../contexts/AuthContext";
 import { CreateDialogv2 } from "./CreateDialogv2";
+import { Track } from "../track";
 
 export default function AlbumInfo() {
 
-    const { album, setCurrentTrackFR, loadArtist } = useContext(TrackContext);
+    const { album, setCurrentTrackFR, loadArtist, setActive } = useContext(TrackContext);
     const { addToPlaylist, user } = useContext(AuthContext)
     const navigate = useNavigate();
 
@@ -16,8 +17,7 @@ export default function AlbumInfo() {
     const [playlistIds, setPlaylistIds] = useState<number[]>([]);
 
     const handleClick = async (data: any) => {
-        loadArtist(data.artist_id);
-        navigate("/artistView");
+        navigate(`/artistView/${data.artist_id}`);
     }
 
     const getPic = (b: Blob | undefined) => {
@@ -37,11 +37,16 @@ export default function AlbumInfo() {
         setDialogOpen(false);
     }
 
+    const handleTrackSwich = (track: Track) => {
+        setCurrentTrackFR(track);
+        setActive("music");
+    }
+
     return <>
         <div className="flex flex-col gap-4 pl-8 pr-8 items-center lg:flex-row">
             <img src={album?.image} alt="albumPic" className="size-52 lg:size-72 object-cover" />
             <div className="flex flex-col">
-                <h1 className="text-4xl font-semibold">{album?.name}</h1>
+                <h1 className="text-2xl lg:text-4xl font-semibold">{album?.name}</h1>
                 <div className="flex flex-row gap-6">
                     <p className="text-lg lg:text-xl">
                         <span className="hover:cursor-pointer hover:underline font-bold" onClick={() => handleClick(album)}>{album?.artist_name}</span>, {album?.tracks?.length}{" "}
@@ -61,14 +66,14 @@ export default function AlbumInfo() {
                 </p>
             </div>
         </div>
-        <div className="flex flex-row gap-10 overflow-scroll mt-auto pl-8 pr-8 pb-8 ">
+        <div className="flex flex-row gap-10 overflow-scroll mt-auto pl-8 pr-8">
             {album?.tracks?.map((track) => (
-                <div className="flex flex-col items-center">
-                    <div className="w-20 h-20 lg:w-32 lg:h-32 flex-shrink-0 relative group">
-                        <img src={track.image} alt="track" className="w-full h-full object-contain hover:cursor-pointer" onClick={() => setCurrentTrackFR(track)} />
-                        <FontAwesomeIcon icon={faPlay} className="absolute hidden lg:block lg:left-10 lg:top-10 lg:size-12 opacity-0 group-hover:opacity-45 transition-all" onClick={() => setCurrentTrackFR(track)} />
+                <div className="flex flex-col items-center" key={crypto.randomUUID()}>
+                    <div className="w-20 h-20 lg:w-32 lg:h-32 flex-shrink-0 relative group mb-auto">
+                        <img src={track.image} alt="track" className="w-full h-full object-contain hover:cursor-pointer" onClick={() => handleTrackSwich(track)} />
+                        <FontAwesomeIcon icon={faPlay} className="absolute hidden lg:block lg:left-10 lg:top-10 lg:size-12 opacity-0 group-hover:opacity-45 transition-all" onClick={() => handleTrackSwich(track)} />
                     </div>
-                    <p className="overflow-hidden h-12 text-center w-28">{track.name}</p>
+                    <p className="h-12 text-center w-28 overflow-hidden">{track.name}</p>
                 </div>
             ))}
         </div>
