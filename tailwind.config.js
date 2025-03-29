@@ -26,6 +26,8 @@ export default {
       },
       screens: {
         xxl: "1921px",
+        'below-md': { max: '767px' },
+        'below-lg': { max: '1023px' },
       },
       maxWidth: {
         '1/5': "20%"

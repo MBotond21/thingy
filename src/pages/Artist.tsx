@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { TrackContext } from "../contexts/MusicContext";
 import { Album } from "../album";
 import { useNavigate, useParams } from "react-router";
@@ -8,13 +8,18 @@ import ScrollingText from "../components/ScrollinText";
 export default function Artist() {
 
     const { artist, loadArtist, active } = useContext(TrackContext);
-    const { user } = useContext(AuthContext);
+    const { user, follow, unfollow } = useContext(AuthContext);
     const { id } = useParams();
+    const [followed, setFollowed] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         if (id) loadArtist(id);
+        if(user?.Followed){
+            const followed = user!.Followed.filter((o) => o.TypeID == (+artist!.id));
+            if(followed.length > 0) setFollowed(true);
+        }
     }, [])
 
     useEffect(() => {
@@ -22,13 +27,27 @@ export default function Artist() {
     }, [id])
 
     const handleClick = (data: Album) => {
-        navigate(`/albumView/${data.id}`);
+        navigate(`/album/${data.id}`);
+    }
+
+    const handleFollow = () => {
+        if(followed){
+            const followed = user!.Followed.filter((o) => o.TypeID == (+artist!.id));
+            followed.map((o) => {
+                unfollow(o.FollowedID);
+            })
+            setFollowed(false);
+        }
+        else {
+            follow(+artist!.id, "Artist");
+            setFollowed(true);
+        }
     }
 
     return <>
         {
             artist ? (
-                <section className={`${user? "flex-3": "flex-4"} ${active == "info" ? "flex" : "hidden lg:flex"} xl:max-h-[80vh] flex-col gap-10 bg-222 rounded-lg p-8 overflow-hidden`}>
+                <div className={`${active == "info" ? "flex" : "hidden lg:flex"} lg:flex h-[75vh] md:h-[80vh] w-full flex-col pt-8 pr-8 pl-8 gap-10 bg-222 rounded-lg overflow-hidden`}>
                     <div className="flex flex-col sm:flex-row gap-4">
                         <img src={artist?.image} alt="albumPic" className="size-64 md:size-72 object-cover" />
                         <div className="flex flex-col">
@@ -37,9 +56,10 @@ export default function Artist() {
                                 {artist?.name}, {artist?.albums?.length}{" "}
                                 {artist?.albums?.length === 1 ? "album" : "albums"},{" "}
                             </p>
+                            { user && <button className="px-2 py-1 bg-white rounded-full w-fit text-black mt-4 ml-auto mr-auto hover:bg-white-kinda transition-all" onClick={() => handleFollow()}>{followed? "unfollow": "follow"}</button> }
                         </div>
                     </div>
-                    <div className="flex flex-row gap-10 overflow-scroll scrollbar-hidden mt-auto">
+                    <div className="flex flex-row gap-10 overflow-scroll scrollbar-hidden mt-auto mb-9">
                         {artist?.albums?.map((album) => (
                             <div key={album.id} className="flex flex-col items-center">
                                 <div className="w-32 h-32 flex-shrink-0">
@@ -49,7 +69,7 @@ export default function Artist() {
                             </div>
                         ))}
                     </div>
-                </section>
+                </div>
             ) : (
                 <div className="w-full h-4/5 flex items-center justify-center">
                     <svg aria-hidden="true" className="w-16 h-16 text-gray-200 animate-spin dark:text-gray-600 fill-yellow-500" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">

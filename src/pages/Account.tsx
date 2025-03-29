@@ -84,7 +84,7 @@ export default function Account() {
     };
 
     return <>
-        <div className="flex bg-222 rounded-lg w-full h-[85vh] columns-2 text-white gap-2 p-4 md:p-10 xxl:p-14 transition-all tsm scrollbar-hidden">
+        <div className="flex bg-222 rounded-lg w-full h-[85vh] columns-2 text-white gap-2 p-4 md:p-10 xxl:p-14 transition-all tsm scrollbar-hidden mt-auto mb-auto">
             <div className="flex flex-row w-full">
                 <label htmlFor="upload" className="inline-block relative size-32 md:size-72 rounded-full shadow-lg cursor-pointer group">
                     <img src={pfp} alt="pfp" className="w-full h-full rounded-full" />
@@ -95,7 +95,7 @@ export default function Account() {
                     <h1 className="text-lg md:text-2xl font-bold">{user?.Username}</h1>
                     <h1 className="text-lg md:text-2xl font-bold">{user?.Email}</h1>
                     <div className="flex flex-row m-2 items-center justify-center group gap-2">
-                        <button onClick={() => setIsEditing(true)}>
+                        <button onClick={() => setIsEditing(!isEditing)}>
                             <FontAwesomeIcon icon={faPen} className="hover:cursor-pointer" />
                         </button>
 
@@ -118,7 +118,7 @@ export default function Account() {
                         </div>
 
                         {!isEditing && (
-                            <p className="cursor-text text-lg max-w-[30vw]">
+                            <p className="cursor-text text-lg max-w-[30vw] max-h-[30vh] overflow-y-scroll break-words scrollbar-hidden">
                                 {newDesc || "description..."}
                             </p>
                         )}

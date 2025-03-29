@@ -10,13 +10,13 @@ export default function Main() {
 
 
     return <>
-        <div className={`${active == "info"? "flex": "hidden lg:flex"} w-full bg-222 rounded-lg max-h-[75vh] md:max-h-[80vh] ${user ? "sm xxl:columns-2" : `${currentTrack? "sm": "columns-2"}`} text-white gap-2 pl-4 pr-4 pb-4 pt-8 xxl:p-10 transition-all tsm justify-between overflow-scroll scrollbar-hidden`}>
-            <div className={`flex w-fit xl:h-full flex-col justify-center gap-10`}>
+        <div className={`${active == "info"? "flex": "hidden lg:flex"} w-full bg-222 rounded-lg max-h-[75vh] md:max-h-[80vh] ${user ? "sm xxl:columns-2" : `${currentTrack? "sm": "columns-2"}`} text-white gap-2 pb-4 pt-8 pr-6 pl-6 xxl:p-10 transition-all tsm justify-between overflow-y-auto scrollbar-hidden`}>
+            <div className={`flex xl:h-full flex-col justify-center gap-10`}>
                 <Top type="week" from="tracks" />
                 <Top type="week" from="albums" />
                 <Top type="week" from="artists" />
             </div>
-            <div className={`flex w-fit xl:h-full flex-col justify-center gap-10`}>
+            <div className={`flex xl:h-full flex-col justify-center gap-10 mb-6`}>
                 <Top type="month" from="tracks" />
                 <Top type="month" from="albums" />
                 <Top type="month" from="artists" />

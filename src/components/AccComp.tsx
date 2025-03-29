@@ -3,10 +3,12 @@ import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
+import { TrackContext } from "../contexts/MusicContext";
 
 export default function AccComp() {
     const navigate = useNavigate();
     const { user, profile, logout } = useContext(AuthContext);
+    const { setActive } = useContext(TrackContext)
     const loggedin = !!user?.Username;
     const [pfp, setPfp] = useState<string>('');
 
@@ -29,6 +31,7 @@ export default function AccComp() {
     }, [user]);
 
     const handleLogout = useCallback(() => {
+        setActive('info');
         logout();
       }, [logout]);
 
@@ -54,7 +57,7 @@ export default function AccComp() {
                     <>
                         <button className="btn hidden md:block" onClick={() => navigate("/signup")}>Signup</button>
                         <button className="btn hidden md:block" onClick={() => navigate("/login")}>Login</button>
-                        <div className="relative md:hidden group">
+                        <div className="relative md:hidden group z-50">
                             <button className="btn peer">
                                 <FontAwesomeIcon icon={faBars} />
                             </button>

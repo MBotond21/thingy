@@ -38,30 +38,28 @@ export default function Top(props: Props) {
 
     const handleClick = async (data: any) => {
         if (props.from == "tracks") {
-            setQueue([]);
             if (window.innerWidth < 1024) {
                 setActive("music");
             }
-            console.log("Top");
             setCurrentTrackFR(data as Track);
-            navigate(`/albumView/${data.album_id}`);
+            setQueue([data]);
+            navigate(`/album/${data.album_id}`);
         };
         if (props.from == "albums") {
-            setQueue([]);
             if (window.innerWidth < 1024) {
                 setActive("info");
             }
-            navigate(`/albumView/${data.id}`);
+            navigate(`/album/${data.id}`);
         };
         if (props.from == "artists") {
-            navigate(`/artistView/${data.id}`);
+            navigate(`/artist/${data.id}`);
         }
     }
 
     return <>
         <div className="w-full">
             <h1 className="text-3xl xxl:text-5xl font-semibold mb-2" >{props.type.substring(0, 1).toUpperCase() + props.type.substring(1, props.type.length)}ly top {props.from}</h1>
-            <div className="flex flex-row gap-10 overflow-scroll scrollbar-hidden">
+            <div className="flex flex-row gap-10 !overflow-x-scroll scrollbar-hidden">
                 {
                     dataMap[props.type.concat(props.from)].map((data) => (
                         <div className="flex flex-col items-center" key={crypto.randomUUID()}>

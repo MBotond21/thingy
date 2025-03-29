@@ -8,4 +8,5 @@ export interface Playlist {
     Description?: string;
     PlaylistCover?: Blob;
     Tracks?: Track[];
+    Private: boolean;
 }

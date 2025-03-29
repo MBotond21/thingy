@@ -12,7 +12,7 @@ import { AuthContext } from './contexts/AuthContext';
 import Account from './pages/Account';
 import PlaylistView from './pages/PlaylistView';
 import Accounts from './pages/Accounts';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import MainPlayer from './components/MainPlayer';
 import Header from './components/Header';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -22,6 +22,7 @@ import PlaylistsPrev from './components/PlaylistPrev';
 import { CreateDialogv2 } from './components/CreateDialogv2';
 import { DraggableItemv2 } from './components/DraggableItemv2';
 import { DraggableContainer } from './contexts/SectionContext';
+import SearchRes from './pages/SearchRes';
 
 function App() {
 
@@ -49,10 +50,10 @@ function App() {
 
   const componentMap: Record<string, React.ReactNode> = {
     playlist: <>
-      <div className={`${active == "playlist" ? "flex" : "hidden lg:flex"} w-full flex-col bg-222 max-h-[75vh] md:max-h-[80vh] rounded-lg pl-6 pt-4 pr-6 md:pl-10 md:pt-36 md:pr-10 items-center text-white overflow-scroll pb-8`}>
+      <div className={`${active == "playlist" ? "flex" : "hidden lg:flex"} w-full flex-col bg-222 h-[75vh] md:h-[80vh] rounded-lg pt-4 md:pt-36 items-center text-white overflow-scroll pb-8`}>
         {
-          user?.Playlists.map((playlist) =>
-            <PlaylistsPrev playlist={playlist} key={crypto.randomUUID()} />
+          user?.Playlists.map((playlist, index) =>
+            <PlaylistsPrev playlist={playlist} key={crypto.randomUUID()} deletable={index != 0} />
           )
         }
         <button className="flex-shrink-0 hover:bg-gray28 p-2 transition-all rounded-md flex items-center justify-center text-xl md:text-base mb-6 lg:mb-0 mt-8" onClick={() => setIsCreating(true)}>
@@ -63,17 +64,18 @@ function App() {
     info: <>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/albumView/:id" element={<AlbumView />} />
-        <Route path='/artistView/:id' element={<Artist />} />
+        <Route path="/album/:id" element={<AlbumView />} />
+        <Route path='/artist/:id' element={<Artist />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/account" element={<Account />} />
         <Route path='/accounts/:id' element={<Accounts />} />
         <Route path='/playlist/:id' element={<PlaylistView />} />
+        <Route path='/search' element={<SearchRes />} />
       </Routes>
     </>,
     mainPlayer: <>
-      <div className={`${active == "music" ? "flex" : "hidden lg:flex"} h-[75vh] w-full md:h-[80vh] flex-col bg-222 rounded-lg`} id='music'>
+      <div className={`${active == "music" ? "flex" : "hidden lg:flex"} w-full h-[75vh] md:h-[80vh] flex-col bg-222 rounded-lg`} id='music'>
         <MainPlayer />
       </div>
     </>
@@ -84,9 +86,9 @@ function App() {
     return storedSections
       ? JSON.parse(storedSections)
       : [
-        { id: 1, type: "playlist", className: "flex-grow-[1]", condition: pCondition },
-        { id: 2, type: "info", className: `flex-grow-[3]`, condition: true },
-        { id: 3, type: "mainPlayer", className: `flex-grow-[2]`, condition: mCondition },
+        { id: 1, type: "playlist", className: `f1 ${active == "playlist" ? "flex" : "hidden lg:flex"}`, condition: pCondition },
+        { id: 2, type: "info", className: `f3 ${active == "info" ? "flex" : "hidden lg:flex"}`, condition: true },
+        { id: 3, type: "mainPlayer", className: `f2 ${active == "music" ? "flex" : "hidden lg:flex"}`, condition: mCondition },
       ];
   });
 
@@ -108,11 +110,11 @@ function App() {
     localStorage.removeItem("newSections");
   }, [])
 
-  useEffect(() => {
-    setMCondition(Boolean(!hideComponents && currentTrack));
-  }, [currentTrack]);
+  useEffect(() => {    
+    setMCondition(Boolean(currentTrack && !hideComponents));
+  }, [currentTrack, hideComponents]);
 
-  useEffect(() => {
+  useEffect(() => {    
     setPCondition(Boolean(user && !hideComponents));
   }, [user]);
 
@@ -121,25 +123,29 @@ function App() {
       prevSections.map((section) => {
         if (section.type === "playlist") {
           return { ...section, condition: pCondition };
-        }
-        if (section.type === "info") {
-          return { ...section, className: `flex-grow-[5]` };
+        } else if (section.type === "mainPlayer") {
+          return { ...section, condition: mCondition };
         }
         return section;
       })
     );
-  }, [pCondition]);
-
+  }, [pCondition, mCondition]);
 
   useEffect(() => {
     setSections((prevSections) =>
-      prevSections.map((section) =>
-        section.type === "mainPlayer"
-          ? { ...section, condition: mCondition }
-          : section
-      )
+      prevSections.map((section) => {
+        if (section.type === "playlist") {
+          return { ...section, className: `f1 ${active == "playlist" ? "flex" : "hidden lg:flex"}` };
+        }
+        else if (section.type === "info"){
+          return { ...section, className: `f3 ${active == "info" ? "flex" : "hidden lg:flex"}` };
+        }
+        else{
+          return { ...section, className: `f2 ${active == "music" ? "flex" : "hidden lg:flex"}` };
+        }
+      })
     );
-  }, [mCondition]);
+  }, [active]);
 
 
   const handleClose = () => setIsCreating(false);
@@ -158,11 +164,11 @@ function App() {
   return (
     <>
       {!hideComponents && <Header />}
-      <main className="flex flex-row h-screen w-full text-white gap-2 p-2 md:p-4 transition-all">
+      <main className="flex flex-row flex-wrap h-screen w-full text-white gap-2 p-2 md:p-4 transition-all">
         <DraggableContainer>
           {
             sections.map((section, index) => (
-              <DraggableItemv2 key={section.id} id={section.id} index={index} moveItem={moveItem} className={`${section.className} !w-full`} condition={section.condition}>
+              <DraggableItemv2 key={section.id} id={section.id} index={index} moveItem={moveItem} className={`${section.className}`} condition={section.condition}>
                 {componentMap[section.type]}
               </DraggableItemv2>
             ))

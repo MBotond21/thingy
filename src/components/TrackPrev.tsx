@@ -13,7 +13,7 @@ interface Props {
     remove: () => void;
 }
 
-export default function PlaylistsPrev(props: Props) {
+export default function TrackPrev(props: Props) {
 
     const navigate = useNavigate();
     const { setCurrentTrackFR } = useContext(TrackContext);
@@ -26,7 +26,7 @@ export default function PlaylistsPrev(props: Props) {
                 <p>{props.track.name}</p>
                 <p className="text-gray-300 hover:text-white hover:underline transition-all" onClick={(event) => {
                     event.stopPropagation();
-                    navigate(`/artistView/${props.track.artist_id}`);
+                    navigate(`/artist/${props.track.artist_id}`);
                 }}>{props.track.artist_name}</p>
             </div>
             <div className="group ml-auto">

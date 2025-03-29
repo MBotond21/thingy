@@ -28,6 +28,10 @@ interface TrackContextState {
     search: (term: string) => void;
     autoComplete: Record<string, string[]> | undefined;
     setAutoComplete: Dispatch<SetStateAction<Record<string, string[]> | undefined>>;
+    searchWTags: (tag: string) => Promise<Track[]>;
+    searchTracks: (term: string) => Promise<Track[]>;
+    searchAlbums: (term: string) => Promise<Album[]>;
+    searchArtists: (term: string) => Promise<Artist[]>;
 }
 
 interface CacheEntry<T> {
@@ -63,6 +67,10 @@ export const TrackContext = createContext<TrackContextState>({
     search: () => { },
     autoComplete: undefined,
     setAutoComplete: () => { },
+    searchWTags: async () => [],
+    searchTracks: async () => [],
+    searchAlbums: async () => [],
+    searchArtists: async () => [],
 });
 
 export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -84,7 +92,6 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const [currentTrack, setCurrentTrack] = useState<Track>();
 
     const [autoComplete, setAutoComplete] = useState<Record<string, string[]>>();
-    const isCurrentlySetting = useRef(false);
 
     const client_id = "8b1de417";
 
@@ -274,7 +281,6 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
                     }
 
                     setAlbum(a);
-                    if (a.tracks) setQueue(a.tracks);
                     localStorage.setItem("album", JSON.stringify(a));
 
                 })
@@ -447,17 +453,12 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }
 
     const setCurrentTrackFR = async (track: Track | undefined) => {
-        // if (isCurrentlySetting.current) return;
-
-        // isCurrentlySetting.current = true;
-        // await setCurrentTrack((prev) => track);
-
-        // setTimeout(() => {
-        //     isCurrentlySetting.current = false;
-        // }, 600);
         console.log("something is setting the current track to: ", track);
         
-        if(track) setCurrentTrack(track);
+        if(track) { 
+            setCurrentTrack(track);
+        }
+        
     };
 
     const search = async (term: string) => {
@@ -474,8 +475,68 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         setAutoComplete(data.results);
     }
 
+    const searchWTags = async (tag: string) => {
+        try {
+            const response = await fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=${client_id}&format=jsonpretty&limit=100&tags=${tag}`);
+
+            if(!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+            const data = await response.json();
+
+            return data.results;
+
+        } catch (e: any) {
+            console.log(e.message);
+        }
+    }
+
+    const searchTracks = async (term: string) => {
+        try {
+            const response = await fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=${client_id}&format=jsonpretty&limit=100&namesearch=${term}`);
+
+            if(!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+            const data = await response.json();
+
+            return data.results;
+
+        } catch (e: any) {
+            console.log(e.message);
+        }
+    }
+
+    const searchAlbums = async (term: string) => {
+        try {
+            const response = await fetch(`https://api.jamendo.com/v3.0/albums/?client_id=${client_id}&format=jsonpretty&limit=100&namesearch=${term}`);
+
+            if(!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+            const data = await response.json();
+
+            return data.results;
+
+        }catch (e: any) {
+            console.log(e.message);            
+        }
+    }
+
+    const searchArtists = async (term: string) => {
+        try {
+            const response = await fetch(`https://api.jamendo.com/v3.0/artists/?client_id=${client_id}&format=jsonpretty&limit=100&namesearch=${term}`);
+
+            if(!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+            const data = await response.json();
+
+            return data.results;
+            
+        }catch (e: any) {
+            console.log(e.message);            
+        }
+    }
+
     return (
-        <TrackContext.Provider value={{ track, album, artist, active, loadTrack, setActive, loadAlbum, loadArtist, loadTopTracks, loadTopAlbums, loadTopArtists, queue, setQueue, wtracks, mtracks, walbums, malbums, wartists, martists, currentTrack, setCurrentTrackFR, search, autoComplete, setAutoComplete }}>
+        <TrackContext.Provider value={{ track, album, artist, active, loadTrack, setActive, loadAlbum, loadArtist, loadTopTracks, loadTopAlbums, loadTopArtists, queue, setQueue, wtracks, mtracks, walbums, malbums, wartists, martists, currentTrack, setCurrentTrackFR, search, autoComplete, setAutoComplete, searchWTags, searchTracks, searchAlbums, searchArtists }}>
             {children}
         </TrackContext.Provider>
     );

@@ -44,16 +44,7 @@ export const DraggableItemv2: React.FC<DraggableItemProps> = ({ id, index, moveI
   drag(drop(ref));
 
   useEffect(() => {
-    const sects = document.getElementsByTagName("section");
-    setAlone(sects.length == 1);
-
-    console.log(condition);
-
-  }, []);
-
-  useEffect(() => {
-    const sects = document.getElementsByTagName("section");
-    setAlone(sects.length == 1);
+    console.log(`${id}, ${condition}`);
   }, [condition]);
 
   useEffect(() => {
@@ -70,13 +61,11 @@ export const DraggableItemv2: React.FC<DraggableItemProps> = ({ id, index, moveI
 
   useEffect(() => {
     setAlone(sectionCount === 1);
-    console.log(sectionCount);
-
   }, [sectionCount]);
 
   return <>
     {
-      condition && <section className={className.concat(" relative w-full")}>
+      condition && <section className={className.concat(" relative h-full overflow-hidden")}>
         {!alone && <div ref={ref} className='bg-white p-1 cursor-move w-full h-p5 rounded-t-lg opacity-0 hover:opacity-40 transition-all absolute top-0 left-0' ></div>}
         {children}
       </section>

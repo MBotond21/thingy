@@ -10,7 +10,7 @@ import TrackPrev from "./TrackPrev";
 import { Track } from "../track";
 
 export default function MainPlayer() {
-    const { queue, currentTrack, setCurrentTrackFR, loadArtist } = useContext(TrackContext);
+    const { queue, currentTrack, setCurrentTrackFR } = useContext(TrackContext);
     const { user, addToPlaylist } = useContext(AuthContext);
     const { like } = useContext(AuthContext);
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -35,6 +35,8 @@ export default function MainPlayer() {
 
     const setCurrentTrack = setCurrentTrackFR;
     const navigate = useNavigate();
+
+    const [history, setHistory] = useState<Track[]>([]);
 
     useEffect(() => {
 
@@ -73,15 +75,16 @@ export default function MainPlayer() {
     }, []);
 
     const stepTrack = () => {
-        if (currentTime >= duration && duration > 0) { 
+        if (currentTime >= duration && duration > 0) {
             if (actQueue.indexOf(currentTrack!) !== actQueue.length - 1) {
                 setCurrentTrack(actQueue[actQueue.indexOf(currentTrack!) + 1]);
             } else {
                 setCurrentTrack(actQueue[0]);
             }
             setCurrentTime(0);
+            setHistory([...history, currentTrack!]);
         }
-    };    
+    };
 
     useEffect(() => {
         stepTrack();
@@ -159,6 +162,8 @@ export default function MainPlayer() {
 
     const handleStep = (n: number) => {
 
+        if(n > 0 && currentTrack) setHistory([...history, currentTrack]);
+
         if (actQueue.indexOf(currentTrack!) == 0 && n < 0) {
             audioRef.current?.pause();
             setCurrentTime(0);
@@ -173,7 +178,7 @@ export default function MainPlayer() {
     }
 
     const handleClick = async (data: any) => {
-        navigate(`/artistView/${data.artist_id}`);
+        navigate(`/artist/${data.artist_id}`);
     }
 
     const isLiked = (id: number) => {
@@ -213,30 +218,47 @@ export default function MainPlayer() {
 
     function shuffleArray(array: Track[]): Track[] {
         const shuffled = [...array].filter(track => track !== currentTrack);
-        const history = array.slice(0, array.indexOf(currentTrack!) + 1);
         for (let i = shuffled.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
-        return [...history, ...shuffled];
+
+        return [...history, currentTrack!, ...shuffled];
     }
 
     useEffect(() => {
         if (shuffle) {
             setActQueue(prevQueue => shuffleArray([...prevQueue]));
         } else {
-            setActQueue(queue);
+            const nQ = queue.slice(queue.indexOf(currentTrack!));
+            setActQueue([...history, ...nQ]);
         }
     }, [shuffle, queue]);
+
+    useEffect(() => {
+        setHistory([]);
+        if (shuffle) {
+            setActQueue(shuffleArray([...queue]));
+        } else {
+            setActQueue(queue);
+        }
+    }, [queue]);
+
+    useEffect(() => {
+        console.log(actQueue);
+    }, [actQueue])
 
     const handleRemove = (track: Track) => {
         const nQueue = [...actQueue].filter((t) => t !== track);
         setActQueue([...nQueue]);
     }
 
+    // useEffect(() => {
+    //     console.log(history);
+    // }, [history])
 
     return <>
-        <div className={`flex-col justify-center items-center w-full h-full ${queueOpen ? "hidden" : "flex"}`}>
+        <div className={`flex-col w-full justify-center items-center h-full ${queueOpen ? "hidden" : "flex"}`}>
             <img src={currentTrack?.image} alt="trackPic" className="hover:cursor-default track size-52 md:size-72" />
             <p className="text-xl md:text-2xl w-fit text-center inline-block"><b className="hover:cursor-pointer hover:underline" onClick={() => handleClick(currentTrack)}>{currentTrack?.artist_name}</b></p>
             <ScrollingText text={currentTrack!.name} className="mt-1 mr-auto ml-auto w-2/4 text-xl md:text-2xl" trigger={[currentTrack]} />
@@ -244,7 +266,7 @@ export default function MainPlayer() {
                 <audio ref={audioRef} className="w-3/4 ml-f-3/4 hover:cursor-default">
                     <source src={currentTrack?.audio} type="audio/mpeg" />
                 </audio>
-                <div className="w-3/4 ml-f-3/4 inline h-6 mt-auto">
+                <div className="w-3/4 ml-f-3/4 inline h-6 mb-4">
                     <div className="flex items-center justify-center gap-10">
                         {
                             user && <button className="size-5">
@@ -303,9 +325,9 @@ export default function MainPlayer() {
             </div>
         </div>
 
-        <div className={`flex-col items-center w-full h-9/10 overflow-scroll p-4 ${queueOpen ? "flex" : "hidden"}`}>
+        <div className={`flex-col items-center w-full h-9/10 overflow-scroll p-4 ${queueOpen ? "flex" : "hidden"} scrollbar-hidden`}>
             {
-                actQueue.slice(actQueue.indexOf(currentTrack!)).map((track, i) =>
+                actQueue.slice(actQueue.lastIndexOf(currentTrack!)).map((track, i) =>
                     <TrackPrev track={track} isFirst={i == 0} add={() => setDialogOpen(true)} remove={() => handleRemove(track)} />
                 )
             }

@@ -16,38 +16,18 @@ const componentMap: Record<string, React.ReactNode> = {
 
 export default function AlbumView() {
     const { album, active, loadAlbum } = useContext(TrackContext);
-    const { user } = useContext(AuthContext)
+    const { user } = useContext(AuthContext);
     const { id } = useParams();
-    const [sections, setSections] = useState<Section[]>(() => {
-        const storedSections = localStorage.getItem("sections");
-        return storedSections
-            ? JSON.parse(storedSections)
-            : [
-                { id: 1, type: "info", className: `${active == "info" ? "flex" : "hidden"} flex-3 lg:flex xl:max-h-[80vh] flex-col gap-10 bg-222 rounded-lg overflow-hidden` },
-                //other sections
-            ];
-    });
 
     useEffect(() => {
         if (id) loadAlbum(id);
     }, [])
 
-    useEffect(() => {
-        localStorage.setItem("sections", JSON.stringify(sections));
-    }, [sections]);
-
-    const moveItem = (fromIndex: number, toIndex: number): void => {
-        const updatedSections = [...sections];
-        const [movedItem] = updatedSections.splice(fromIndex, 1);
-        updatedSections.splice(toIndex, 0, movedItem);
-        setSections(updatedSections);
-    };
-
     return <>
         {
             album ? (
                 <>
-                    <div className={`${active == "info" ? "flex" : "hidden lg:flex"} ${user? "flex-3": "flex-4"} lg:flex h-[75vh] md:h-[80vh] flex-col pt-8 pr-8 pl-8 gap-10 bg-222 rounded-lg overflow-hidden`}>
+                    <div className={`${active == "info" ? "flex" : "hidden lg:flex"} lg:flex h-[75vh] md:h-[80vh] w-full flex-col pt-8 pr-8 pl-8 gap-10 bg-222 rounded-lg overflow-hidden`}>
                         <AlbumInfo/>
                     </div>
                 </>

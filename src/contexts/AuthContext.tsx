@@ -2,6 +2,13 @@ import { createContext, Dispatch, SetStateAction, useEffect, useState } from "re
 import { User } from "../user";
 import { Playlist } from "../playlist";
 
+type UpdatePlaylistParams = {
+    PlaylistName?: string;
+    Description?: string;
+    PlaylistCover?: File;
+    Private?: boolean;
+};
+
 interface AuthContextState {
     user: User | null;
     reg: (Email: string, Username: string, Password: string) => Promise<string | undefined>;
@@ -12,12 +19,17 @@ interface AuthContextState {
     like: (trackId: string) => void;
     getPlaylist: (PlaylistID: number) => Promise<Playlist | undefined>;
     createPlaylist: (PlaylistName: string, Private: boolean, Description?: string, PlaylistCover?: File) => void;
+    updatePlaylist: (PlaylistId: number, update: UpdatePlaylistParams) => void;
     getUser: (id: number) => Promise<Object | undefined>;
     streamPic: (pic: File) => void;
     addToPlaylist: (trackId: string[], playlistId: number[]) => void;
     search: (term: string) => void;
     autoComplete: Record<string, any[]> | undefined;
     setAutoComplete: Dispatch<SetStateAction<Record<string, any[]> | undefined>>;
+    searchPlaylists: (term: string) => Promise<Playlist[]>;
+    follow: (FollowedID: number, Type: string) => void;
+    unfollow: (FollowedID: number) => void;
+    deletePlaylist: (id: number) => void;
 }
 
 export const AuthContext = createContext<AuthContextState>({
@@ -30,12 +42,17 @@ export const AuthContext = createContext<AuthContextState>({
     like: () => { },
     getPlaylist: async () => undefined,
     createPlaylist: () => { },
+    updatePlaylist: async () => { },
     getUser: async () => undefined,
     streamPic: () => { },
     addToPlaylist: () => { },
     search: () => { },
     autoComplete: undefined,
     setAutoComplete: () => { },
+    searchPlaylists: async () => [],
+    follow: async () => {},
+    unfollow: async () => {},
+    deletePlaylist: async () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -72,7 +89,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 Username: data.Username,
                 Pfp: data.Pfp ? new Blob([new Uint8Array(data.Pfp.data)], { type: "image/png" }) : null,
                 Description: data.Description,
-                Playlists: data.Playlists
+                Playlists: data.Playlists,
+                Followed: [],
             });
 
         } catch (error) {
@@ -255,12 +273,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }
 
-    const updatePlaylist = async (PlaylistId: number, PlaylistName?: string, Description?: string, PlaylistCover?: File) => {
+    const updatePlaylist = async (PlaylistId: number, update: UpdatePlaylistParams) => {
         try {
             const f = new FormData();
-            if (PlaylistName) f.append("PlaylistName", PlaylistName);
-            if (Description) f.append("Description", Description);
-            if (PlaylistCover) f.append("PlaylistCover", PlaylistCover);
+            if (update.PlaylistName) f.append("PlaylistName", update.PlaylistName);
+            if (update.Description) f.append("Description", update.Description);
+            if (update.PlaylistCover) f.append("PlaylistCover", update.PlaylistCover);
+            if (update.Private !== undefined) f.append("Private", update.Private.toString());     
 
             const response = await fetch(`http://localhost:3000/playlists/${PlaylistId}`, {
                 method: 'PATCH',
@@ -282,9 +301,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 PlaylistCover: data.PlaylistCover ? new Blob([new Uint8Array(data.PlaylistCover.data)], { type: "image/png" }) : null
             }
 
-            user!.Playlists = user!.Playlists.map((o) => o.PlaylistID == nData.PlaylistID? nData: o);
+            user!.Playlists = user!.Playlists.map((o) => o.PlaylistID == nData.PlaylistID ? nData : o);
 
-        }catch(e: any) {
+        } catch (e: any) {
             alert(e.message);
         }
     }
@@ -313,7 +332,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 Username: data.Username,
                 Pfp: data.Pfp ? new Blob([new Uint8Array(data.Pfp.data)], { type: "image/png" }) : null,
                 Description: data.Description,
-                Playlists: rep
+                Playlists: rep,
+                Followed: data.Follows,
             });
 
         } catch (e: any) {
@@ -367,13 +387,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             // const p = await getPfp(data.UserID);
 
+            const rep = data.Playlists.map((playlist: any) => ({
+                ...playlist,
+                PlaylistCover: playlist.PlaylistCover ? new Blob([new Uint8Array(playlist.PlaylistCover.data)], { type: "image/png" }) : null
+            }));
+
             setUser({
                 Id: data.UserID,
                 Email: data.Email,
                 Username: data.Username,
                 Pfp: data.Pfp ? new Blob([new Uint8Array(data.Pfp.data)], { type: "image/png" }) : null,
                 Description: data.Description,
-                Playlists: data.Playlists
+                Playlists: rep,
+                Followed: [],
             });
         } catch (e: any) {
             console.error(e.message);
@@ -424,8 +450,90 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setAutoComplete(data);
     }
 
+    const searchPlaylists = async (term: string) => {
+        try {
+            const response = await fetch(`http://localhost:3000/search/playlist?term=${term}&userId=${user?.Id}`);
+
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+
+            const data = await response.json();
+
+            return data;
+
+        } catch (e: any) {
+            console.log(e.message);
+        }
+    }
+
+    const follow = async (FollowedID: number, Type: string) => {
+        try {
+            const response = await fetch(`http://localhost:3000/followed`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token || localStorage.getItem("accessToken")}`,
+                },
+                body: JSON.stringify({ FollowedID, Type })
+            });
+
+            if (!response.ok) {
+                const e = await response.json();
+                throw new Error(e.message);
+            }
+
+            const data = await response.json();
+
+            user!.Followed = [...user!.Followed, data]; 
+
+        } catch (e: any) {
+            console.log(e.message);
+        }
+    }
+
+    const unfollow = async (FollowedID: number) => {
+        try {
+            const response = await fetch(`http://localhost:3000/followed/${FollowedID}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token || localStorage.getItem("accessToken")}`,
+                },
+            });
+
+            if (!response.ok) {
+                const e = await response.json();
+                throw new Error(e.message);
+            }
+
+            user!.Followed = user!.Followed.filter((o) => o.FollowedID != FollowedID);
+
+        } catch (e: any) {
+            console.log(e.message);
+        }
+    }
+
+    const deletePlaylist = async (id: number) => {
+        try {
+            const response = await fetch(`http://localhost:3000/playlists/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token || localStorage.getItem("accessToken")}`,
+                },
+            });
+
+            if (!response.ok) {
+                const e = await response.json();
+                throw new Error(e.message);
+            }
+
+            user!.Playlists = user!.Playlists.filter((o) => o.PlaylistID != id);
+
+        } catch (e: any) {
+            console.log(e.message);
+        }
+    }
+
     return (
-        <AuthContext.Provider value={{ user, reg, login, profile, update, logout, like, getPlaylist, createPlaylist, getUser, streamPic, addToPlaylist, search, autoComplete, setAutoComplete }}>
+        <AuthContext.Provider value={{ user, reg, login, profile, update, logout, like, getPlaylist, createPlaylist, updatePlaylist, getUser, streamPic, addToPlaylist, search, autoComplete, setAutoComplete, searchPlaylists, follow, unfollow, deletePlaylist }}>
             {children}
         </AuthContext.Provider>
     );

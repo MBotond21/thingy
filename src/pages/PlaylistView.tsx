@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router"
 import { Playlist } from "../playlist";
 import { AuthContext } from "../contexts/AuthContext";
@@ -9,15 +9,17 @@ export default function PlaylistView() {
 
     const { id } = useParams();
     const { active, setActive } = useContext(TrackContext);
-    const { getPlaylist } = useContext(AuthContext);
+    const { getPlaylist, user } = useContext(AuthContext);
     const [playlist, setIsPlaylist] = useState<Playlist | undefined>(undefined);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const navigate = useNavigate();
+    const playlistRef = useRef<Playlist | undefined>(undefined);
 
     useEffect(() => {
         const load = async () => {
             setIsLoading(true);
-            const p = await getPlaylist(+id!)
+            const p = await getPlaylist(+id!);
+            playlistRef.current = p;
             setIsPlaylist(p);
             setIsLoading(false);
         }
@@ -28,13 +30,20 @@ export default function PlaylistView() {
     useEffect(() => {
         const load = async () => {
             setIsLoading(true);
-            const p = await getPlaylist(+id!)
+            const p = await getPlaylist(+id!);
+            playlistRef.current = p;
             setIsPlaylist(p);
             setIsLoading(false);
         }
         load();
         setActive("info");
     }, [id])
+
+    useEffect(() => {
+        if(!user && !isLoading && playlist?.Private){
+            navigate('/');
+        }
+    }, [playlist, isLoading, user])
 
     useEffect(() => {
         if (!isLoading && !playlist) {
@@ -46,9 +55,9 @@ export default function PlaylistView() {
         {
                 !isLoading && playlist ? (
                     <>
-                        <section className={`${active == "info"? "flex": "hidden lg:flex"} flex-3 max-h-[75vh] md:max-h-[80vh] flex-col gap-10 bg-222 rounded-lg overflow-hidden p-8`}>
+                        <div className={`${active == "info" ? "flex" : "hidden lg:flex"} lg:flex h-[75vh] md:h-[80vh] w-full flex-col pt-8 pr-8 pl-8 gap-10 bg-222 rounded-lg overflow-hidden`}>
                             <PlaylistInfo playlist={playlist} />
-                        </section>
+                        </div>
                     </>
                 ) : (
                     <div className="w-full h-4/5 flex items-center justify-center">

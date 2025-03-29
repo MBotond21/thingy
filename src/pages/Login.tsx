@@ -23,7 +23,7 @@ export default function Login() {
     }, [email, psw]);
 
     return <>
-        <div className="bg-222 w-4/5 h-4/5 lg:w-2/4 xl:w-1/4 rounded-lg m-auto">
+        <div className="bg-222 w-full h-4/5 lg:w-2/4 xl:w-1/4 rounded-lg m-auto">
             <div className="w-full h-1/3 flex items-center justify-center">
                 <img src="/logo.png" alt="site" onClick={() => navigate("/")} className="size-28 hover:cursor-pointer rounded-full shadow-xl" />
             </div>

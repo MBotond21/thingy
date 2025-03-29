@@ -1,3 +1,4 @@
+import { Followed } from "./followed";
 import { Playlist } from "./playlist";
 
 export interface User{
@@ -7,4 +8,5 @@ export interface User{
     Pfp: Blob | null;
     Description: string | null;
     Playlists: Playlist[];
+    Followed: Followed[];
 }
