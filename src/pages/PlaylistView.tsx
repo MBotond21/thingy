@@ -55,7 +55,7 @@ export default function PlaylistView() {
         {
                 !isLoading && playlist ? (
                     <>
-                        <div className={`${active == "info" ? "flex" : "hidden lg:flex"} lg:flex h-[75vh] md:h-[80vh] w-full flex-col pt-8 pr-8 pl-8 gap-10 bg-222 rounded-lg overflow-hidden`}>
+                        <div className={`${active == "info" ? "flex" : "hidden lg:flex"} lg:flex h-[75vh] md:h-[80vh] xxl:h-[85vh] w-full flex-col pt-8 pr-8 pl-8 gap-10 bg-222 rounded-lg overflow-hidden`}>
                             <PlaylistInfo playlist={playlist} />
                         </div>
                     </>

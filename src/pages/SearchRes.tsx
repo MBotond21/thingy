@@ -131,7 +131,7 @@ export default function SearchRes() {
     }, [term, filter]);
 
     return <>
-        <div className={`${active == "info" ? "flex" : "hidden lg:flex"} lg:flex h-[75vh] md:h-[80vh] w-full flex-col pt-8 pr-8 pl-8 gap-10 bg-222 rounded-lg overflow-y-scroll overflow-x-clip scrollbar-hidden`}>
+        <div className={`${active == "info" ? "flex" : "hidden lg:flex"} lg:flex h-[75vh] md:h-[80vh] xxl:h-[85vh] w-full flex-col pt-8 pr-8 pl-8 gap-10 bg-222 rounded-lg overflow-y-scroll overflow-x-clip scrollbar-hidden`}>
             {
                 !Object.values(results).every(obj => Object.keys(obj).length === 0) ? (
                     Object.entries(results).map(([category, items]) => (
@@ -147,7 +147,7 @@ export default function SearchRes() {
                                                     category != "playlists" ? (
                                                         <SearchItemPrev key={key} img={value.image} artist={value.artist_name ? value.artist_name : value.name} artist_id={value.artist_id ? value.artist_id : value.id} name={value.artist_name ? value.name : undefined} onClick={() => handleClick(category, value)} />
                                                     ) : (
-                                                        <PlaylistsPrev playlist={value} />
+                                                        <PlaylistsPrev playlist={value} deletable={false} />
                                                     )
                                                 )
                                             }

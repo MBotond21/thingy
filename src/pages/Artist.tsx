@@ -16,22 +16,29 @@ export default function Artist() {
 
     useEffect(() => {
         if (id) loadArtist(id);
-        if(user?.Followed){
-            const followed = user!.Followed.filter((o) => o.TypeID == (+artist!.id));
-            if(followed.length > 0) setFollowed(true);
-        }
     }, [])
 
     useEffect(() => {
         if (id) loadArtist(id);
+        const art = user?.Followed.filter((o) => o.TypeID == (+artist!.id));
+        if (art) setFollowed(true);
+        else setFollowed(false);
     }, [id])
+
+    useEffect(() => {
+        if (user && artist) {
+            const art = user.Followed.filter((o) => o.TypeID == (+artist!.id));
+            if (art) setFollowed(true);
+            else setFollowed(false);
+        }
+    }, [user, artist])
 
     const handleClick = (data: Album) => {
         navigate(`/album/${data.id}`);
     }
 
     const handleFollow = () => {
-        if(followed){
+        if (followed) {
             const followed = user!.Followed.filter((o) => o.TypeID == (+artist!.id));
             followed.map((o) => {
                 unfollow(o.FollowedID);
@@ -47,7 +54,7 @@ export default function Artist() {
     return <>
         {
             artist ? (
-                <div className={`${active == "info" ? "flex" : "hidden lg:flex"} lg:flex h-[75vh] md:h-[80vh] w-full flex-col pt-8 pr-8 pl-8 gap-10 bg-222 rounded-lg overflow-hidden`}>
+                <div className={`${active == "info" ? "flex" : "hidden lg:flex"} lg:flex h-[75vh] md:h-[80vh] xxl:h-[85vh] w-full flex-col pt-8 pr-8 pl-8 gap-10 bg-222 rounded-lg overflow-hidden`}>
                     <div className="flex flex-col sm:flex-row gap-4">
                         <img src={artist?.image} alt="albumPic" className="size-64 md:size-72 object-cover" />
                         <div className="flex flex-col">
@@ -56,7 +63,7 @@ export default function Artist() {
                                 {artist?.name}, {artist?.albums?.length}{" "}
                                 {artist?.albums?.length === 1 ? "album" : "albums"},{" "}
                             </p>
-                            { user && <button className="px-2 py-1 bg-white rounded-full w-fit text-black mt-4 ml-auto mr-auto hover:bg-white-kinda transition-all" onClick={() => handleFollow()}>{followed? "unfollow": "follow"}</button> }
+                            {user && <button className="px-2 py-1 bg-white rounded-full w-fit text-black mt-4 ml-auto mr-auto hover:bg-white-kinda transition-all" onClick={() => handleFollow()}>{followed ? "unfollow" : "follow"}</button>}
                         </div>
                     </div>
                     <div className="flex flex-row gap-10 overflow-scroll scrollbar-hidden mt-auto mb-9">
@@ -65,7 +72,7 @@ export default function Artist() {
                                 <div className="w-32 h-32 flex-shrink-0">
                                     <img src={album.image} alt="track" className="w-full h-full object-contain hover:cursor-pointer" onClick={() => handleClick(album)} />
                                 </div>
-                                <ScrollingText text={album.name} className="w-24" trigger={album}/>
+                                <ScrollingText text={album.name} className="w-24" trigger={album} />
                             </div>
                         ))}
                     </div>

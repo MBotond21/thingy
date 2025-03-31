@@ -26,7 +26,7 @@ export default function AccComp() {
 
             return () => URL.revokeObjectURL(url);
         }else{
-            setPfp('default.png');
+            setPfp('/default.png');
         }
     }, [user]);
 

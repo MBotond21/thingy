@@ -84,7 +84,7 @@ export default function Account() {
     };
 
     return <>
-        <div className="flex bg-222 rounded-lg w-full h-[85vh] columns-2 text-white gap-2 p-4 md:p-10 xxl:p-14 transition-all tsm scrollbar-hidden mt-auto mb-auto">
+        <div className="flex bg-222 rounded-lg w-full h-[85vh] xxl:h-[90vh] columns-2 text-white gap-2 p-4 md:p-10 xxl:p-14 transition-all tsm scrollbar-hidden mt-auto mb-auto">
             <div className="flex flex-row w-full">
                 <label htmlFor="upload" className="inline-block relative size-32 md:size-72 rounded-full shadow-lg cursor-pointer group">
                     <img src={pfp} alt="pfp" className="w-full h-full rounded-full" />

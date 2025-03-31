@@ -50,7 +50,7 @@ function App() {
 
   const componentMap: Record<string, React.ReactNode> = {
     playlist: <>
-      <div className={`${active == "playlist" ? "flex" : "hidden lg:flex"} w-full flex-col bg-222 h-[75vh] md:h-[80vh] rounded-lg pt-4 md:pt-36 items-center text-white overflow-scroll pb-8`}>
+      <div className={`${active == "playlist" ? "flex" : "hidden lg:flex"} w-full flex-col bg-222 h-[75vh] md:h-[80vh] xxl:h-[85vh] rounded-lg pt-4 md:pt-36 items-center text-white overflow-scroll pb-8`}>
         {
           user?.Playlists.map((playlist, index) =>
             <PlaylistsPrev playlist={playlist} key={crypto.randomUUID()} deletable={index != 0} />
@@ -75,7 +75,7 @@ function App() {
       </Routes>
     </>,
     mainPlayer: <>
-      <div className={`${active == "music" ? "flex" : "hidden lg:flex"} w-full h-[75vh] md:h-[80vh] flex-col bg-222 rounded-lg`} id='music'>
+      <div className={`${active == "music" ? "flex" : "hidden lg:flex"} w-full h-[75vh] md:h-[80vh] xxl:h-[85vh] flex-col bg-222 rounded-lg`} id='music'>
         <MainPlayer />
       </div>
     </>
@@ -86,9 +86,9 @@ function App() {
     return storedSections
       ? JSON.parse(storedSections)
       : [
-        { id: 1, type: "playlist", className: `f1 ${active == "playlist" ? "flex" : "hidden lg:flex"}`, condition: pCondition },
-        { id: 2, type: "info", className: `f3 ${active == "info" ? "flex" : "hidden lg:flex"}`, condition: true },
-        { id: 3, type: "mainPlayer", className: `f2 ${active == "music" ? "flex" : "hidden lg:flex"}`, condition: mCondition },
+        { id: 1, type: "playlist", className: `flex-2 ${active == "playlist" ? "flex" : "hidden lg:flex"}`, condition: pCondition },
+        { id: 2, type: "info", className: `${currentTrack? "flex-[7]": "flex-6"} ${active == "info" ? "flex" : "hidden lg:flex"}`, condition: true },
+        { id: 3, type: "mainPlayer", className: `flex-3 ${active == "music" ? "flex" : "hidden lg:flex"}`, condition: mCondition },
       ];
   });
 
@@ -138,7 +138,7 @@ function App() {
           return { ...section, className: `f1 ${active == "playlist" ? "flex" : "hidden lg:flex"}` };
         }
         else if (section.type === "info"){
-          return { ...section, className: `f3 ${active == "info" ? "flex" : "hidden lg:flex"}` };
+          return { ...section, className: `${currentTrack? "f4": "f3"} ${active == "info" ? "flex" : "hidden lg:flex"}` };
         }
         else{
           return { ...section, className: `f2 ${active == "music" ? "flex" : "hidden lg:flex"}` };

@@ -80,10 +80,9 @@ export default function AlbumInfo() {
                 <form className="flex flex-col p-2 md:p-4 gap-4 scrollbar-hidden">
                     {
                         user?.Playlists.map((playlist) =>
-                            <div className="flex flex-row items-center gap-6">
-                                <img src={getPic(playlist.PlaylistCover)} alt="playlistPic" className="size-16 rounded-md" />
-                                <p className="w-24 overflow-scroll">{playlist.PlaylistName}</p>
-                                <input type="checkbox" name="add" value={playlist.PlaylistID} checked={playlistIds.includes(playlist.PlaylistID)} onChange={() => handleChange(playlist.PlaylistID)} />
+                            <div className={`flex flex-row gap-2 w-[95%] ml-auto mr-auto items-center hover:cursor-pointer rounded-md p-2 pr-8 ${playlistIds.includes(playlist.PlaylistID) ? "bg-yellow-400 hover:bg-yellow-500 text-gray28" : "hover:bg-gray28 text-white"} hover:shadow-lg mt-8 -mb-8 group`} onClick={() => handleChange(playlist.PlaylistID)}>
+                                <img src={getPic(playlist.PlaylistCover)} alt="playlistPic" className="size-14 rounded-sm" />
+                                <p>{playlist.PlaylistName}</p>
                             </div>
                         )
                     }

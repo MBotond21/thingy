@@ -40,6 +40,16 @@ export default function MainPlayer() {
 
     useEffect(() => {
 
+        try {
+            const c = localStorage.getItem("cTrack");
+            if(c) setCurrentTrack(JSON.parse(c));
+
+            const a = localStorage.getItem("aQueue");
+            if(a) setCurrentTrack(JSON.parse(a));
+        } catch {
+            console.log("couldn't load from cache");
+        }
+
         if (actQueue.length > 0 && !currentTrack) {
             setCurrentTrack(actQueue[0]);
         }
@@ -73,6 +83,11 @@ export default function MainPlayer() {
             audio.removeEventListener("pause", handlePause);
         };
     }, []);
+
+    useEffect(() => {
+        localStorage.setItem("cTrack", JSON.stringify(currentTrack));
+        localStorage.setItem("aQueue", JSON.stringify(actQueue));
+    }, [currentTrack, actQueue]);
 
     const stepTrack = () => {
         if (currentTime >= duration && duration > 0) {
@@ -162,7 +177,7 @@ export default function MainPlayer() {
 
     const handleStep = (n: number) => {
 
-        if(n > 0 && currentTrack) setHistory([...history, currentTrack]);
+        if (n > 0 && currentTrack) setHistory([...history, currentTrack]);
 
         if (actQueue.indexOf(currentTrack!) == 0 && n < 0) {
             audioRef.current?.pause();
@@ -253,6 +268,13 @@ export default function MainPlayer() {
         setActQueue([...nQueue]);
     }
 
+    useEffect(() => {
+        if (!dialogOpen) {
+            setPlaylistIds([]);
+        }
+    }, [dialogOpen]);
+
+
     // useEffect(() => {
     //     console.log(history);
     // }, [history])
@@ -328,7 +350,7 @@ export default function MainPlayer() {
         <div className={`flex-col items-center w-full h-9/10 overflow-scroll p-4 ${queueOpen ? "flex" : "hidden"} scrollbar-hidden`}>
             {
                 actQueue.slice(actQueue.lastIndexOf(currentTrack!)).map((track, i) =>
-                    <TrackPrev track={track} isFirst={i == 0} add={() => setDialogOpen(true)} remove={() => handleRemove(track)} />
+                    <TrackPrev track={track} isFirst={i == 0} add={() => { setDialogOpen(true); setPlaylistIds([]); }} remove={() => handleRemove(track)} />
                 )
             }
         </div>
@@ -344,10 +366,14 @@ export default function MainPlayer() {
                     <form className="flex flex-col p-2 md:p-4 gap-4">
                         {
                             user?.Playlists.map((playlist) =>
-                                <div className="flex flex-row items-center gap-6">
-                                    <img src={getPic(playlist.PlaylistCover)} alt="playlistPic" className="size-16 rounded-md" />
-                                    <p className="w-24 overflow-scroll">{playlist.PlaylistName}</p>
-                                    <input type="checkbox" name="add" value={playlist.PlaylistID} checked={playlistIds.includes(playlist.PlaylistID)} onChange={() => handleChange(playlist.PlaylistID)} />
+                                // <div className="flex flex-row items-center gap-6">
+                                //     <img src={getPic(playlist.PlaylistCover)} alt="playlistPic" className="size-16 rounded-md" />
+                                //     <p className="w-24 overflow-scroll">{playlist.PlaylistName}</p>
+                                //     <input type="checkbox" name="add" value={playlist.PlaylistID} checked={playlistIds.includes(playlist.PlaylistID)} onChange={() => handleChange(playlist.PlaylistID)} />
+                                // </div>
+                                <div className={`flex flex-row gap-2 w-[95%] ml-auto mr-auto items-center hover:cursor-pointer rounded-md p-2 pr-8 ${playlistIds.includes(playlist.PlaylistID) ? "bg-yellow-400 hover:bg-yellow-500 text-gray28" : "hover:bg-gray28 text-white"} hover:shadow-lg mt-8 -mb-8 group`} onClick={() => handleChange(playlist.PlaylistID)}>
+                                    <img src={getPic(playlist.PlaylistCover)} alt="playlistPic" className="size-14 rounded-sm" />
+                                    <p>{playlist.PlaylistName}</p>
                                 </div>
                             )
                         }

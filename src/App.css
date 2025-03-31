@@ -24,11 +24,15 @@ header {
 }
 
 .f2 {
-    flex: 4 !important;
+    flex: 3 !important;
 }
 
 .f3 {
     flex: 6 !important;
+}
+
+.f4 {
+    flex: 7 !important;
 }
 
 main {
@@ -219,14 +223,11 @@ input[type="range"].vert::-ms-thumb {
     }
 }
 
-@media screen and (max-width: 1920px) {
-    .sm {
-        flex-direction: column;
-        columns: 1;
-        width: 100%;
-    }
+.sm {
+    flex-direction: column;
+    columns: 1;
+    width: 100%;
 }
-
 @media screen and (min-width: 900px) {
     .sm {
         align-items: center;
