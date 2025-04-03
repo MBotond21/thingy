@@ -42,10 +42,10 @@ export default function MainPlayer() {
 
         try {
             const c = localStorage.getItem("cTrack");
-            if(c) setCurrentTrack(JSON.parse(c));
+            if (c) setCurrentTrack(JSON.parse(c));
 
             const a = localStorage.getItem("aQueue");
-            if(a) setCurrentTrack(JSON.parse(a));
+            if (a) setCurrentTrack(JSON.parse(a));
         } catch {
             console.log("couldn't load from cache");
         }
@@ -160,7 +160,7 @@ export default function MainPlayer() {
             audio.volume = parseFloat(e.target.value);
             setVolume(audio.volume);
             localStorage.setItem("volume", volume.toString());
-            e.target.style.background = `linear-gradient(to top, #FDDA0D 0%, #FDDA0D ${parseFloat(e.target.value) * 100}%, #ccc ${parseFloat(e.target.value) * 100}%)`;
+            e.target.style.background = `linear-gradient(to right, #222 0%, #222 ${parseFloat(e.target.value) * 100}%, white ${parseFloat(e.target.value) * 100}%)`;
         }
     };
 
@@ -337,12 +337,25 @@ export default function MainPlayer() {
                             />
                             <span id="duration" className="w-8">{formatTime(duration)}</span>
                         </div>
-                        <div className="hidden relative lg:flex flex-col items-center p-2 ml-4 -mr-8 w-9 h-9 z-10 transition ease-in-out duration-700 group g">
-                            <FontAwesomeIcon icon={audioRef.current?.volume! > 0.4 ? faVolumeHigh : audioRef.current?.volume == 0 ? faVolumeMute : faVolumeLow} className="size-5 cursor-pointer transition ease-in-out duration-700 group-hover:text-black" onClick={handleMute} />
-                            <input type="range" className="vert absolute bottom-3/4 mb-2 hidden group-hover:flex hover:flex w-24 m-8 transition ease-in-out duration-700" value={audioRef.current?.volume} min={0} max={1} step={0.05} onChange={handleVolume} />
-                        </div>
                     </div>
-
+                    {
+                        audioRef.current && <div className="flex items-center m-auto gap-2 bg-white-kinda px-4 py-2 rounded-lg w-48 hover:cursor-pointer">
+                        <FontAwesomeIcon
+                            icon={audioRef.current.volume > 0.4 ? faVolumeHigh : audioRef.current!.volume === 0 ? faVolumeMute : faVolumeLow}
+                            className="text-gray28 text-lg"
+                            onClick={handleMute}
+                        />
+                        <input
+                            type="range"
+                            className="w-full h-2 bg-black rounded-lg appearance-none cursor-pointer"
+                            value={volume}
+                            min={0}
+                            max={1} 
+                            step={0.05}
+                            onChange={handleVolume}
+                        />
+                    </div>
+                    }
                 </div>
             </div>
         </div>

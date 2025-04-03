@@ -174,47 +174,8 @@ main {
     flex: 2;
   }
 
-  input[type="range"].vert {
-    writing-mode: vertical-lr;
-    direction: rtl;
-    appearance: none;
-    width: 8px;
-    height: 8rem;
-    background: #000 !important;
-    border-radius: 4px;
-    animation: volumeAnim 700ms ease-in-out;
-}
-
 .bottom-34{
     bottom: 8.5rem;
-}
-
-input[type="range"].vert::-webkit-slider-thumb {
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    background: #222;
-    border: #222;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-input[type="range"].vert::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    background: #222;
-    border: #222;
-    border-radius: 50%;
-    cursor: pointer;
-}
-
-input[type="range"].vert::-ms-thumb {
-    width: 16px;
-    height: 16px;
-    background: #222;
-    border: #222;
-    border-radius: 50%;
-    cursor: pointer;
 }
   
   @media screen and (max-width: 1280px) {
@@ -232,28 +193,6 @@ input[type="range"].vert::-ms-thumb {
     .sm {
         align-items: center;
     }
-}
-
-@keyframes volumeAnim {
-    0%{
-        height: 0;
-    }
-    100%{
-        height: 8rem;
-    }
-}
-
-@keyframes volumeBgAnim {
-    0%{
-        top: -0.5rem;
-    }
-    100%{
-        height: -9rem;
-    }
-}
-
-.g::before{
-    animation: volumeBgAnim 700ms ease-in-out;
 }
 
 .like-anim{
@@ -288,18 +227,6 @@ input[type="range"].vert::-ms-thumb {
     }
   }
 
-.g:hover::before{
-    content: "";
-    position: absolute;
-    z-index: -1;
-    top: -9rem;
-    bottom: -0.5rem;
-    left: -0.5rem;
-    right: -0.5rem;
-    background: #cbcbcb;
-    border-radius: 30px;
-}
-
 .scrollbar-hidden::-webkit-scrollbar {
     display: none;
   }
@@ -311,14 +238,3 @@ input[type="range"].vert::-ms-thumb {
   .overflow-scroll {
     overflow: auto;
   }  
-
-
-  .miafasz{
-    position: absolute;
-    background-color: red;
-    width: 100%;
-    height: 3rem;
-    z-index: 999;
-    bottom: 0;
-    left: 0;
-  }
