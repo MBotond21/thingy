@@ -19,15 +19,15 @@ export default function Artist() {
     }, [])
 
     useEffect(() => {
-        if (id) loadArtist(id);
-        const art = user?.Followed.filter((o) => o.TypeID == (+artist!.id));
-        if (art) setFollowed(true);
+        if (id) {
+            loadArtist(id);
+        }
         else setFollowed(false);
     }, [id])
 
     useEffect(() => {
         if (user && artist) {
-            const art = user.Followed.filter((o) => o.TypeID == (+artist!.id));
+            const art = user.Follows.filter((o) => o.TypeID == (+artist!.id));
             if (art) setFollowed(true);
             else setFollowed(false);
         }
@@ -39,7 +39,7 @@ export default function Artist() {
 
     const handleFollow = () => {
         if (followed) {
-            const followed = user!.Followed.filter((o) => o.TypeID == (+artist!.id));
+            const followed = user!.Follows.filter((o) => o.TypeID == (+artist!.id));
             followed.map((o) => {
                 unfollow(o.FollowedID);
             })
@@ -54,7 +54,7 @@ export default function Artist() {
     return <>
         {
             artist ? (
-                <div className={`${active == "info" ? "flex" : "hidden lg:flex"} lg:flex h-[75vh] md:h-[80vh] xxl:h-[85vh] w-full flex-col pt-8 pr-8 pl-8 gap-10 bg-222 rounded-lg overflow-hidden`}>
+                <div className={`${active == "info" ? "flex" : "hidden lg:flex"} lg:flex h-[75vh] md:h-[80vh] xxl:h-[85vh] w-full flex-col pt-8 xxl:pt-16 pr-8 pl-8 gap-10 bg-222 rounded-lg overflow-hidden`}>
                     <div className="flex flex-col sm:flex-row gap-4">
                         <img src={artist?.image} alt="albumPic" className="size-64 md:size-72 object-cover" />
                         <div className="flex flex-col">

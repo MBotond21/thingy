@@ -8,5 +8,5 @@ export interface User{
     Pfp: Blob | null;
     Description: string | null;
     Playlists: Playlist[];
-    Followed: Followed[];
+    Follows: Followed[];
 }

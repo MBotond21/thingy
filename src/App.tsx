@@ -23,6 +23,7 @@ import { CreateDialogv2 } from './components/CreateDialogv2';
 import { DraggableItemv2 } from './components/DraggableItemv2';
 import { DraggableContainer } from './contexts/SectionContext';
 import SearchRes from './pages/SearchRes';
+import FollowPrev from './components/FollowPrev';
 
 function App() {
 
@@ -55,6 +56,11 @@ function App() {
           user?.Playlists.map((playlist, index) =>
             <PlaylistsPrev playlist={playlist} key={crypto.randomUUID()} deletable={index != 0} />
           )
+        }
+        {
+          user?.Follows.map((follow, index) => (
+            <FollowPrev key={index} follow={follow}/>
+          ))
         }
         <button className="flex-shrink-0 hover:bg-gray28 p-2 transition-all rounded-md flex items-center justify-center text-xl md:text-base mb-6 lg:mb-0 mt-8" onClick={() => setIsCreating(true)}>
           <FontAwesomeIcon icon={faPlusCircle} className="size-6" />

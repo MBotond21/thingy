@@ -90,7 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 Pfp: data.Pfp ? new Blob([new Uint8Array(data.Pfp.data)], { type: "image/png" }) : null,
                 Description: data.Description,
                 Playlists: data.Playlists,
-                Followed: [],
+                Follows: [],
             });
 
         } catch (error) {
@@ -333,7 +333,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 Pfp: data.Pfp ? new Blob([new Uint8Array(data.Pfp.data)], { type: "image/png" }) : null,
                 Description: data.Description,
                 Playlists: rep,
-                Followed: data.Follows,
+                Follows: data.Follows,
             });
 
         } catch (e: any) {
@@ -399,7 +399,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 Pfp: data.Pfp ? new Blob([new Uint8Array(data.Pfp.data)], { type: "image/png" }) : null,
                 Description: data.Description,
                 Playlists: rep,
-                Followed: [],
+                Follows: [],
             });
         } catch (e: any) {
             console.error(e.message);
@@ -483,7 +483,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             const data = await response.json();
 
-            user!.Followed = [...user!.Followed, data]; 
+            user!.Follows = [...user!.Follows, data]; 
+
+            setUser(prevUser => {
+                if (prevUser) {
+                  return {
+                    ...prevUser,
+                    Follows: [...prevUser.Follows, data],
+                  };
+                }
+                return prevUser;
+              });
 
         } catch (e: any) {
             console.log(e.message);
@@ -504,7 +514,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 throw new Error(e.message);
             }
 
-            user!.Followed = user!.Followed.filter((o) => o.FollowedID != FollowedID);
+            setUser(prevUser => {
+                if (prevUser) {
+                  return {
+                    ...prevUser,
+                    Follows: prevUser.Follows.filter((o) => o.FollowedID != FollowedID),
+                  };
+                }
+                return prevUser;
+              });              
 
         } catch (e: any) {
             console.log(e.message);

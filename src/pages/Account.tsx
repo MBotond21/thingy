@@ -3,6 +3,8 @@ import { AuthContext } from "../contexts/AuthContext"
 import { useNavigate } from "react-router";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ScrollingText from "../components/ScrollinText";
+import { Playlist } from "../playlist";
 
 export default function Account() {
 
@@ -83,6 +85,15 @@ export default function Account() {
         }
     };
 
+    const getPic = (b: Blob | undefined) => {
+        if (!b) return "/playlist_cover.png"
+        return URL.createObjectURL(b);
+    }
+
+    function handleClick(playlist: Playlist): void {
+        navigate(`/playlist/${playlist.PlaylistID}`);
+    }
+
     return <>
         <div className="flex bg-222 rounded-lg w-full h-[85vh] xxl:h-[90vh] columns-2 text-white gap-2 p-4 md:p-10 xxl:p-14 transition-all tsm scrollbar-hidden mt-auto mb-auto">
             <div className="flex flex-row w-full">
@@ -122,6 +133,17 @@ export default function Account() {
                                 {newDesc || "description..."}
                             </p>
                         )}
+                    </div>
+
+                    <div className="flex flex-row gap-10 overflow-scroll scrollbar-hidden mt-auto mb-9">
+                        {user?.Playlists.map((playlist) => (
+                            <div key={playlist.PlaylistID} className="flex flex-col items-center">
+                                <div className="w-32 h-32 flex-shrink-0">
+                                    <img src={getPic(playlist.PlaylistCover)} alt="track" className="w-full h-full object-contain hover:cursor-pointer" onClick={() => handleClick(playlist)} />
+                                </div>
+                                <ScrollingText text={playlist.PlaylistName} className="w-24" trigger={playlist} />
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
