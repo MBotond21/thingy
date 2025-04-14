@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router"
-import { AuthContext } from "../contexts/AuthContext";
+import { ApiContext } from "../contexts/ApiContext";
 
 export default function Signup() {
     const navigate = useNavigate();
-    const { reg, user } = useContext(AuthContext);
+    const { reg, user } = useContext(ApiContext);
     const [email, setEmail] = useState<string>("");
     const [username, setUsername] = useState<string>("");
     const [psw, setPsw] = useState<string>("");

@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef, useState } from "react"
-import { AuthContext } from "../contexts/AuthContext"
+import { ApiContext } from "../contexts/ApiContext"
 import { useNavigate } from "react-router";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -8,7 +8,7 @@ import { Playlist } from "../playlist";
 
 export default function Account() {
 
-    const { user, profile, update, streamPic } = useContext(AuthContext);
+    const { user, profile, update, streamPic } = useContext(ApiContext);
     const [pfp, setPfp] = useState<string>('');
     const navigate = useNavigate();
     const [newDesc, setNewDesc] = useState<string>(user?.Description || "");
@@ -136,7 +136,7 @@ export default function Account() {
                     </div>
 
                     <div className="flex flex-row gap-10 overflow-scroll scrollbar-hidden mt-auto mb-9">
-                        {user?.Playlists.map((playlist) => (
+                        {user?.Playlists && user?.Playlists.map((playlist) => (
                             <div key={playlist.PlaylistID} className="flex flex-col items-center">
                                 <div className="w-32 h-32 flex-shrink-0">
                                     <img src={getPic(playlist.PlaylistCover)} alt="track" className="w-full h-full object-contain hover:cursor-pointer" onClick={() => handleClick(playlist)} />

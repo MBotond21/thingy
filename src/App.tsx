@@ -4,11 +4,11 @@ import Home from './pages/Home';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import AlbumView from './pages/Album';
-import { TrackContext } from './contexts/MusicContext';
+import { MusicContext } from './contexts/MusicContext';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Artist from './pages/Artist';
-import { AuthContext } from './contexts/AuthContext';
+import { ApiContext } from './contexts/ApiContext';
 import Account from './pages/Account';
 import PlaylistView from './pages/PlaylistView';
 import Accounts from './pages/Accounts';
@@ -27,8 +27,8 @@ import FollowPrev from './components/FollowPrev';
 
 function App() {
 
-  const { currentTrack, active } = useContext(TrackContext)
-  const { user, createPlaylist } = useContext(AuthContext);
+  const { currentTrack, active } = useContext(MusicContext)
+  const { user, createPlaylist } = useContext(ApiContext);
   const location = useLocation();
   const [isCreating, setIsCreating] = useState<boolean>(false);
 
@@ -53,7 +53,7 @@ function App() {
     playlist: <>
       <div className={`${active == "playlist" ? "flex" : "hidden lg:flex"} w-full flex-col bg-222 h-[75vh] md:h-[80vh] xxl:h-[85vh] rounded-lg pt-4 md:pt-36 items-center text-white overflow-scroll pb-8`}>
         {
-          user?.Playlists.map((playlist, index) =>
+          user?.Playlists && user?.Playlists.map((playlist, index) =>
             <PlaylistsPrev playlist={playlist} key={crypto.randomUUID()} deletable={index != 0} />
           )
         }

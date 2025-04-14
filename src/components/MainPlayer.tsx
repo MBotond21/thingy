@@ -1,18 +1,18 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { TrackContext } from "../contexts/MusicContext";
+import { MusicContext } from "../contexts/MusicContext";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay, faPause, faForwardStep, faBackwardStep, faVolumeMute, faVolumeLow, faVolumeHigh, faHeartCirclePlus, faHeartCircleMinus, faCirclePlus, faBars, faShuffle } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router";
-import { AuthContext } from "../contexts/AuthContext";
+import { ApiContext } from "../contexts/ApiContext";
 import { CreateDialogv2 } from "./CreateDialogv2";
 import ScrollingText from "./ScrollinText";
 import TrackPrev from "./TrackPrev";
 import { Track } from "../track";
 
 export default function MainPlayer() {
-    const { queue, currentTrack, setCurrentTrackFR } = useContext(TrackContext);
-    const { user, addToPlaylist } = useContext(AuthContext);
-    const { like } = useContext(AuthContext);
+    const { queue, currentTrack, setCurrentTrackFR } = useContext(MusicContext);
+    const { user, addToPlaylist } = useContext(ApiContext);
+    const { like } = useContext(ApiContext);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
     const [currentTime, setCurrentTime] = useState<number>(0);

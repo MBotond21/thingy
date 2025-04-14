@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react"
-import { AuthContext } from "../contexts/AuthContext"
+import { ApiContext } from "../contexts/ApiContext"
 import { useNavigate, useParams } from "react-router";
 import { Playlist } from "../playlist";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,7 +14,7 @@ interface OutsideUser {
 
 export default function Accounts() {
 
-    const { user, getUser, profile } = useContext(AuthContext);
+    const { user, getUser, profile } = useContext(ApiContext);
     const { id } = useParams();
     const navigate = useNavigate();
     const [current, setCurrent] = useState<OutsideUser>();

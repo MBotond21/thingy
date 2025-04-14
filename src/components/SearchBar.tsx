@@ -1,11 +1,11 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import { AuthContext } from "../contexts/AuthContext";
+import { ApiContext } from "../contexts/ApiContext";
 import { useNavigate } from "react-router";
-import { TrackContext } from "../contexts/MusicContext";
+import { MusicContext } from "../contexts/MusicContext";
 
 export default function SearchBar() {
 
-    const { search, autoComplete, setAutoComplete } = useContext(AuthContext);
+    const { search, autoComplete, setAutoComplete } = useContext(ApiContext);
     const [term, setTerm] = useState<string>("");
     const [filtered, setFiltered] = useState<any[]>([]);
     const [filter, setFilter] = useState<string>("all");

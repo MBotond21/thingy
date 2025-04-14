@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { TrackContext } from "../contexts/MusicContext";
+import { MusicContext } from "../contexts/MusicContext";
 import { Track } from "../track";
 import { Album } from "../album";
 import { Artist } from "../artist";
@@ -15,7 +15,7 @@ export default function Top(props: Props) {
 
     const navigate = useNavigate();
 
-    const { loadAlbum, loadArtist, loadTopTracks, loadTopAlbums, loadTopArtists, wtracks, mtracks, walbums, malbums, wartists, martists, setQueue, setCurrentTrackFR, setActive } = useContext(TrackContext);
+    const { loadAlbum, loadArtist, loadTopTracks, loadTopAlbums, loadTopArtists, wtracks, mtracks, walbums, malbums, wartists, martists, setQueue, setCurrentTrackFR, setActive } = useContext(MusicContext);
 
     const dataMap: Record<string, any[]> = {
         weektracks: wtracks,

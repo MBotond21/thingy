@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faX } from "@fortawesome/free-solid-svg-icons"
 import { useContext, useState } from "react";
 import imageCompression from "browser-image-compression";
-import { AuthContext } from "../contexts/AuthContext";
+import { ApiContext } from "../contexts/ApiContext";
 
 interface Props {
     close: () => void;
@@ -10,7 +10,7 @@ interface Props {
 
 export default function CreateDialog(props: Props) {
 
-    const { createPlaylist } = useContext(AuthContext)
+    const { createPlaylist } = useContext(ApiContext)
 
     const [name, setName] = useState<string>("");
     const [desc, setDesc] = useState<string>("");

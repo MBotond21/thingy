@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { Track } from "../track";
-import { TrackContext } from "../contexts/MusicContext";
+import { MusicContext } from "../contexts/MusicContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisV, faPlusCircle, faTrashCan } from "@fortawesome/free-solid-svg-icons";
-import { AuthContext } from "../contexts/AuthContext";
+import { ApiContext } from "../contexts/ApiContext";
 
 interface Props {
     track: Track;
@@ -16,8 +16,8 @@ interface Props {
 export default function TrackPrev(props: Props) {
 
     const navigate = useNavigate();
-    const { setCurrentTrackFR } = useContext(TrackContext);
-    const { user } = useContext(AuthContext);
+    const { setCurrentTrackFR } = useContext(MusicContext);
+    const { user } = useContext(ApiContext);
 
     return <>
         <div className={`flex relative flex-row gap-2 w-full items-center hover:cursor-pointer rounded-md p-2 pr-8 hover:shadow-lg ${props.isFirst ? "bg-yellow-400 hover:bg-yellow-500 text-gray28" : "hover:bg-gray28 text-white"}`} onClick={() => setCurrentTrackFR(props.track)}>

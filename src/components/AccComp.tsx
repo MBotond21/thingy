@@ -2,13 +2,13 @@ import { useNavigate } from "react-router";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { AuthContext } from "../contexts/AuthContext";
-import { TrackContext } from "../contexts/MusicContext";
+import { ApiContext } from "../contexts/ApiContext";
+import { MusicContext } from "../contexts/MusicContext";
 
 export default function AccComp() {
     const navigate = useNavigate();
-    const { user, profile, logout } = useContext(AuthContext);
-    const { setActive } = useContext(TrackContext)
+    const { user, profile, logout } = useContext(ApiContext);
+    const { setActive } = useContext(MusicContext)
     const loggedin = !!user?.Username;
     const [pfp, setPfp] = useState<string>('');
 

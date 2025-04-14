@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
-import { TrackContext } from "../contexts/MusicContext";
+import { MusicContext } from "../contexts/MusicContext";
 import AlbumInfo from "../components/AlbumInfo";
 import { useParams } from "react-router";
-import { AuthContext } from "../contexts/AuthContext";
+import { ApiContext } from "../contexts/ApiContext";
 
 interface Section {
     id: number;
@@ -15,8 +15,8 @@ const componentMap: Record<string, React.ReactNode> = {
 };
 
 export default function AlbumView() {
-    const { album, active, loadAlbum } = useContext(TrackContext);
-    const { user } = useContext(AuthContext);
+    const { album, active, loadAlbum } = useContext(MusicContext);
+    const { user } = useContext(ApiContext);
     const { id } = useParams();
 
     useEffect(() => {

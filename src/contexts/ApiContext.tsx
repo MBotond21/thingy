@@ -9,7 +9,7 @@ type UpdatePlaylistParams = {
     Private?: boolean;
 };
 
-interface AuthContextState {
+interface ApiContextState {
     user: User | null;
     reg: (Email: string, Username: string, Password: string) => Promise<string | undefined>;
     login: (Email: string, Password: string) => Promise<string | undefined>;
@@ -32,7 +32,7 @@ interface AuthContextState {
     deletePlaylist: (id: number) => void;
 }
 
-export const AuthContext = createContext<AuthContextState>({
+export const ApiContext = createContext<ApiContextState>({
     user: null,
     reg: async () => undefined,
     login: async () => undefined,
@@ -55,7 +55,7 @@ export const AuthContext = createContext<AuthContextState>({
     deletePlaylist: async () => {},
 });
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [token, setToken] = useState<string>("");
     const [refresh, setRefresh] = useState<string>("");
@@ -82,6 +82,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (!response.ok) throw new Error("Upload failed");
 
             const data = await response.json();
+            console.log(data);
+
+            const rep = data.Playlists.map((playlist: any) => ({
+                ...playlist,
+                PlaylistCover: playlist.PlaylistCover ? new Blob([new Uint8Array(playlist.PlaylistCover.data)], { type: "image/png" }) : null
+            }));
+
 
             setUser({
                 Id: data.UserID,
@@ -89,7 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 Username: data.Username,
                 Pfp: data.Pfp ? new Blob([new Uint8Array(data.Pfp.data)], { type: "image/png" }) : null,
                 Description: data.Description,
-                Playlists: data.Playlists,
+                Playlists: rep,
                 Follows: [],
             });
 
@@ -222,29 +229,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         } catch (e: any) {
             alert(e.message);
-        }
-    }
-
-    const getPlaylists = async () => {
-        try {
-            const response = await fetch("http://localhost:3000/playlists?includeFullTracks=true", {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${token || localStorage.getItem("accessToken")}`,
-                },
-            });
-
-            if (!response.ok) {
-                const e = await response.json();
-                throw new Error(e.message);
-            }
-
-            const data = await response.json();
-
-            return data;
-
-        } catch (e: any) {
-            console.log(e.message);
         }
     }
 
@@ -392,6 +376,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 PlaylistCover: playlist.PlaylistCover ? new Blob([new Uint8Array(playlist.PlaylistCover.data)], { type: "image/png" }) : null
             }));
 
+            console.log(rep);
+
             setUser({
                 Id: data.UserID,
                 Email: data.Email,
@@ -466,6 +452,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     const follow = async (FollowedID: number, Type: string) => {
+        console.log("following");
+    
         try {
             const response = await fetch(`http://localhost:3000/followed`, {
                 method: 'POST',
@@ -473,34 +461,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token || localStorage.getItem("accessToken")}`,
                 },
-                body: JSON.stringify({ FollowedID, Type })
+                body: JSON.stringify({ FollowedID, Type }),
             });
-
+    
             if (!response.ok) {
                 const e = await response.json();
                 throw new Error(e.message);
             }
-
+    
             const data = await response.json();
-
-            user!.Follows = [...user!.Follows, data]; 
-
+    
             setUser(prevUser => {
                 if (prevUser) {
-                  return {
-                    ...prevUser,
-                    Follows: [...prevUser.Follows, data],
-                  };
+                    return {
+                        ...prevUser,
+                        Follows: [...prevUser.Follows, data],
+                    };
                 }
                 return prevUser;
-              });
-
+            });
+    
         } catch (e: any) {
             console.log(e.message);
         }
-    }
+    };    
 
     const unfollow = async (FollowedID: number) => {
+        console.log("unfollowing");
+        
         try {
             const response = await fetch(`http://localhost:3000/followed/${FollowedID}`, {
                 method: 'DELETE',
@@ -551,8 +539,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     return (
-        <AuthContext.Provider value={{ user, reg, login, profile, update, logout, like, getPlaylist, createPlaylist, updatePlaylist, getUser, streamPic, addToPlaylist, search, autoComplete, setAutoComplete, searchPlaylists, follow, unfollow, deletePlaylist }}>
+        <ApiContext.Provider value={{ user, reg, login, profile, update, logout, like, getPlaylist, createPlaylist, updatePlaylist, getUser, streamPic, addToPlaylist, search, autoComplete, setAutoComplete, searchPlaylists, follow, unfollow, deletePlaylist }}>
             {children}
-        </AuthContext.Provider>
+        </ApiContext.Provider>
     );
 }

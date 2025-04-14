@@ -2,12 +2,12 @@ import { useNavigate } from "react-router";
 import AccComp from "./AccComp";
 import SearchBar from "./SearchBar";
 import { useContext } from "react";
-import { TrackContext } from "../contexts/MusicContext";
+import { MusicContext } from "../contexts/MusicContext";
 
 export default function Header(){
 
     const navigate = useNavigate();
-    const { setActive } = useContext(TrackContext)
+    const { setActive } = useContext(MusicContext)
 
     const navToHome = () => {
         navigate("/");

@@ -2,8 +2,9 @@ import { createContext, Dispatch, SetStateAction, useEffect, useRef, useState } 
 import { Track } from "../track";
 import { Album } from "../album";
 import { Artist } from "../artist";
+import { Followed } from "../followed";
 
-interface TrackContextState {
+interface MusicContextState {
     track: Track | null;
     album: Album | undefined;
     artist: Artist | undefined;
@@ -32,6 +33,7 @@ interface TrackContextState {
     searchTracks: (term: string) => Promise<Track[]>;
     searchAlbums: (term: string) => Promise<Album[]>;
     searchArtists: (term: string) => Promise<Artist[]>;
+    resolveFollowItem: (item: Followed) => Promise<{name: string, image: string, owner: string} | null>;
 }
 
 interface CacheEntry<T> {
@@ -42,7 +44,7 @@ interface Cache {
     [key: string]: CacheEntry<any>;
 }
 
-export const TrackContext = createContext<TrackContextState>({
+export const MusicContext = createContext<MusicContextState>({
     track: null,
     album: undefined,
     artist: undefined,
@@ -71,9 +73,10 @@ export const TrackContext = createContext<TrackContextState>({
     searchTracks: async () => [],
     searchAlbums: async () => [],
     searchArtists: async () => [],
+    resolveFollowItem: async () => null,
 });
 
-export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const MusicContextProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [track, setTrack] = useState<Track | null>(null);
     const [album, setAlbum] = useState<Album>();
     const [artist, setArtist] = useState<Artist>();
@@ -93,11 +96,50 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const [autoComplete, setAutoComplete] = useState<Record<string, string[]>>();
 
+    type resolvedItem = { name: string, image: string, owner: string };
+
+    const fetchers: Record<string, (id: string) => Promise<resolvedItem>> = {
+        Artist: async (id) => {
+            const res = await fetch(`https://api.jamendo.com/v3.0/artists/?client_id=${client_id}&format=jsonpretty&id=${id}`);
+            const data = await res.json();
+            return { name: toReadable(data.results[0].name)!, image: data.results[0].image || "default.png", owner: toReadable(data.results[0].name)! }
+        },
+        Album: async (id) => {
+            const res = await fetch(`https://api.jamendo.com/v3.0/albums/?client_id=${client_id}&format=jsonpretty&id=${id}`);
+            const data = await res.json();
+            return { name: data.results[0].name, image: data.results[0].image, owner: toReadable(data.results[0].artist_name)! }
+        },
+        Playlist: async (id) => {
+            const res = await fetch(`http://localhost:3000/playlists/${id}`);
+            const data = await res.json();
+            //data.PlaylistCover ? new Blob([new Uint8Array(data.PlaylistCover.data)], { type: "image/png" }) : null
+
+            let pc = null;
+
+            if(data.PlaylistCover) {
+                pc = URL.createObjectURL(new Blob([new Uint8Array(data.PlaylistCover.data)], { type: "image/png" }));
+            } else {
+                pc = '/playlist_cover.png';
+            }
+
+            const u = await fetch(`http://localhost:3000/users/other/${data.OwnerID}`);
+            const d = await u.json();
+
+            return { name: data.PlaylistName, image: pc, owner: d.Username };
+        },
+    };
+
     const client_id = "8b1de417";
 
     useEffect(() => {
-        if(!currentTrack) setActive('info');
+        if (!currentTrack) setActive('info');
     }, []);
+
+    const resolveFollowItem = async (item: Followed): Promise<resolvedItem | null> => {
+        const fetcher = fetchers[item.Type];
+        if (!fetcher) return null;
+        return await fetcher((item.PlaylistID? item.PlaylistID!.toString(): item.TypeID!.toString()));
+      };
 
     const toReadable = (text: string) => {
         const parser = new DOMParser();
@@ -454,11 +496,11 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     const setCurrentTrackFR = async (track: Track | undefined) => {
         console.log("something is setting the current track to: ", track);
-        
-        if(track) { 
+
+        if (track) {
             setCurrentTrack(track);
         }
-        
+
     };
 
     const search = async (term: string) => {
@@ -479,7 +521,7 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         try {
             const response = await fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=${client_id}&format=jsonpretty&limit=100&tags=${tag}`);
 
-            if(!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
             const data = await response.json();
 
@@ -494,7 +536,7 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         try {
             const response = await fetch(`https://api.jamendo.com/v3.0/tracks/?client_id=${client_id}&format=jsonpretty&limit=100&namesearch=${term}`);
 
-            if(!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
             const data = await response.json();
 
@@ -509,14 +551,14 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         try {
             const response = await fetch(`https://api.jamendo.com/v3.0/albums/?client_id=${client_id}&format=jsonpretty&limit=100&namesearch=${term}`);
 
-            if(!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
             const data = await response.json();
 
             return data.results;
 
-        }catch (e: any) {
-            console.log(e.message);            
+        } catch (e: any) {
+            console.log(e.message);
         }
     }
 
@@ -524,20 +566,20 @@ export const TrackContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
         try {
             const response = await fetch(`https://api.jamendo.com/v3.0/artists/?client_id=${client_id}&format=jsonpretty&limit=100&namesearch=${term}`);
 
-            if(!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
 
             const data = await response.json();
 
             return data.results;
-            
-        }catch (e: any) {
-            console.log(e.message);            
+
+        } catch (e: any) {
+            console.log(e.message);
         }
     }
 
     return (
-        <TrackContext.Provider value={{ track, album, artist, active, loadTrack, setActive, loadAlbum, loadArtist, loadTopTracks, loadTopAlbums, loadTopArtists, queue, setQueue, wtracks, mtracks, walbums, malbums, wartists, martists, currentTrack, setCurrentTrackFR, search, autoComplete, setAutoComplete, searchWTags, searchTracks, searchAlbums, searchArtists }}>
+        <MusicContext.Provider value={{ track, album, artist, active, loadTrack, setActive, loadAlbum, loadArtist, loadTopTracks, loadTopAlbums, loadTopArtists, queue, setQueue, wtracks, mtracks, walbums, malbums, wartists, martists, currentTrack, setCurrentTrackFR, search, autoComplete, setAutoComplete, searchWTags, searchTracks, searchAlbums, searchArtists, resolveFollowItem }}>
             {children}
-        </TrackContext.Provider>
+        </MusicContext.Provider>
     );
 }

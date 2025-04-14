@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react"
-import { TrackContext } from "../contexts/MusicContext"
+import { MusicContext } from "../contexts/MusicContext"
 import { useLocation, useNavigate } from "react-router";
-import { AuthContext } from "../contexts/AuthContext";
+import { ApiContext } from "../contexts/ApiContext";
 import { Playlist } from "../playlist";
 import { Track } from "../track";
 import { Artist } from "../artist";
@@ -23,8 +23,8 @@ type Result = {
 
 export default function SearchRes() {
     const query = useQuery();
-    const { active, searchWTags, searchTracks, searchAlbums, searchArtists, setCurrentTrackFR, setQueue } = useContext(TrackContext);
-    const { searchPlaylists } = useContext(AuthContext);
+    const { active, searchWTags, searchTracks, searchAlbums, searchArtists, setCurrentTrackFR, setQueue } = useContext(MusicContext);
+    const { searchPlaylists } = useContext(ApiContext);
     const term = query.get("term");
     const filter = query.get("filter");
 

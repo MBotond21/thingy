@@ -1,16 +1,16 @@
 import { useContext, useState } from "react"
-import { TrackContext } from "../contexts/MusicContext"
+import { MusicContext } from "../contexts/MusicContext"
 import { faPlay, faPlusCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router";
-import { AuthContext } from "../contexts/AuthContext";
+import { ApiContext } from "../contexts/ApiContext";
 import { CreateDialogv2 } from "./CreateDialogv2";
 import { Track } from "../track";
 
 export default function AlbumInfo() {
 
-    const { album, setCurrentTrackFR, loadArtist, setActive, setQueue } = useContext(TrackContext);
-    const { addToPlaylist, user } = useContext(AuthContext)
+    const { album, setCurrentTrackFR, loadArtist, setActive, setQueue } = useContext(MusicContext);
+    const { addToPlaylist, user } = useContext(ApiContext)
     const navigate = useNavigate();
 
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);

@@ -4,11 +4,11 @@ import Home from './pages/Home';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import AlbumView from './pages/Album';
-import { TrackContext } from './contexts/MusicContext';
+import { MusicContext } from './contexts/MusicContext';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Artist from './pages/Artist';
-import { AuthContext } from './contexts/AuthContext';
+import { ApiContext } from './contexts/ApiContext';
 import Account from './pages/Account';
 import PlaylistView from './pages/PlaylistView';
 import Accounts from './pages/Accounts';
@@ -23,8 +23,8 @@ import { CreateDialogv2 } from './components/CreateDialogv2';
 
 function App() {
 
-  const { currentTrack, active } = useContext(TrackContext)
-  const { user, createPlaylist } = useContext(AuthContext);
+  const { currentTrack, active } = useContext(MusicContext)
+  const { user, createPlaylist } = useContext(ApiContext);
   const location = useLocation();
   const [isCreating, setIsCreating] = useState<boolean>(false);
 

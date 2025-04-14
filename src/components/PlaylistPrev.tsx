@@ -3,7 +3,7 @@ import { Playlist } from "../playlist"
 import { useNavigate } from "react-router";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
-import { AuthContext } from "../contexts/AuthContext";
+import { ApiContext } from "../contexts/ApiContext";
 
 interface Props {
     playlist: Playlist;
@@ -13,7 +13,7 @@ interface Props {
 export default function PlaylistsPrev(props: Props){
 
     const [pic, setPic] = useState<string>('');
-    const { deletePlaylist } = useContext(AuthContext);
+    const { deletePlaylist } = useContext(ApiContext);
     const navigate = useNavigate();
 
     useEffect(() => {

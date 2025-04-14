@@ -1,55 +1,50 @@
 import { useContext, useEffect, useState } from "react";
-import { TrackContext } from "../contexts/MusicContext";
+import { MusicContext } from "../contexts/MusicContext";
 import { Album } from "../album";
 import { useNavigate, useParams } from "react-router";
-import { AuthContext } from "../contexts/AuthContext";
+import { ApiContext } from "../contexts/ApiContext";
 import ScrollingText from "../components/ScrollinText";
 
 export default function Artist() {
 
-    const { artist, loadArtist, active } = useContext(TrackContext);
-    const { user, follow, unfollow } = useContext(AuthContext);
+    const { artist, loadArtist, active } = useContext(MusicContext);
+    const { user, follow, unfollow } = useContext(ApiContext);
     const { id } = useParams();
     const [followed, setFollowed] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (id) loadArtist(id);
-    }, [])
-
-    useEffect(() => {
         if (id) {
             loadArtist(id);
+        } else {
+            setFollowed(false);
         }
-        else setFollowed(false);
-    }, [id])
+    }, [id]);
 
     useEffect(() => {
         if (user && artist) {
-            const art = user.Follows.filter((o) => o.TypeID == (+artist!.id));
-            if (art) setFollowed(true);
-            else setFollowed(false);
+            const isFollowing = user.Follows.some((o) => o.TypeID === +artist.id);
+            setFollowed(isFollowing);
+        } else {
+            setFollowed(false);
         }
-    }, [user, artist])
+    }, [user, artist]);    
 
     const handleClick = (data: Album) => {
         navigate(`/album/${data.id}`);
     }
 
-    const handleFollow = () => {
+    const handleFollow = async () => {
         if (followed) {
-            const followed = user!.Follows.filter((o) => o.TypeID == (+artist!.id));
-            followed.map((o) => {
+            const followedItems = user!.Follows.filter((o) => o.TypeID === +artist!.id);
+            followedItems.forEach((o) => {
                 unfollow(o.FollowedID);
-            })
-            setFollowed(false);
-        }
-        else {
+            });
+        } else {
             follow(+artist!.id, "Artist");
-            setFollowed(true);
         }
-    }
+    };
 
     return <>
         {

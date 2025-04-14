@@ -1,15 +1,15 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router"
 import { Playlist } from "../playlist";
-import { AuthContext } from "../contexts/AuthContext";
+import { ApiContext } from "../contexts/ApiContext";
 import PlaylistInfo from "../components/PlaylistInfo";
-import { TrackContext } from "../contexts/MusicContext";
+import { MusicContext } from "../contexts/MusicContext";
 
 export default function PlaylistView() {
 
     const { id } = useParams();
-    const { active, setActive } = useContext(TrackContext);
-    const { getPlaylist, user } = useContext(AuthContext);
+    const { active, setActive } = useContext(MusicContext);
+    const { getPlaylist, user } = useContext(ApiContext);
     const [playlist, setIsPlaylist] = useState<Playlist | undefined>(undefined);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const navigate = useNavigate();

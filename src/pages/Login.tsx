@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router"
-import { AuthContext } from "../contexts/AuthContext";
+import { ApiContext } from "../contexts/ApiContext";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -8,7 +8,7 @@ export default function Login() {
     const [psw, setPsw] = useState<string>("");
     const [error, setError] = useState<string | undefined>(undefined);
 
-    const { login } = useContext(AuthContext);
+    const { login } = useContext(ApiContext);
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();

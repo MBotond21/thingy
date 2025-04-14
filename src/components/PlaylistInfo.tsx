@@ -1,11 +1,11 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import { Playlist } from "../playlist"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faCirclePlay, faXmarkCircle, faPen } from "@fortawesome/free-solid-svg-icons";
+import { faPlay, faPen } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router";
 import { Track } from "../track";
-import { TrackContext } from "../contexts/MusicContext";
-import { AuthContext } from "../contexts/AuthContext";
+import { MusicContext } from "../contexts/MusicContext";
+import { ApiContext } from "../contexts/ApiContext";
 
 interface Props {
     playlist: Playlist;
@@ -16,8 +16,8 @@ export default function PlaylistInfo(props: Props) {
     const playlist = props.playlist;
     const [pic, setPic] = useState<string>('');
     const navigate = useNavigate();
-    const { setCurrentTrackFR, setQueue } = useContext(TrackContext);
-    const { user, updatePlaylist, follow, unfollow } = useContext(AuthContext);
+    const { setCurrentTrackFR, setQueue } = useContext(MusicContext);
+    const { user, updatePlaylist, follow, unfollow } = useContext(ApiContext);
     const owned = (playlist.OwnerID == user?.Id);
 
     const likedP = (user?.Playlists[0].PlaylistID == playlist.PlaylistID);
@@ -45,8 +45,8 @@ export default function PlaylistInfo(props: Props) {
             setPic('/playlist_cover.png');
         }
 
-        if(user?.Followed){
-            const followed = user!.Followed.filter((o) => o.PlaylistID == playlist.PlaylistID);
+        if(user?.Follows){
+            const followed = user!.Follows.filter((o) => o.PlaylistID == playlist.PlaylistID);
             if(followed.length > 0) setFollowed(true);
         }
 
@@ -56,6 +56,15 @@ export default function PlaylistInfo(props: Props) {
     useEffect(() => {
         if (playlist) setNewName(playlist.PlaylistName);
     }, [playlist])
+
+    useEffect(() => {
+        if (user && playlist) {
+            const isFollowing = user.Follows.some((o) => o.PlaylistID === playlist.PlaylistID);
+            setFollowed(isFollowing);
+        } else {
+            setFollowed(false);
+        }
+    }, [playlist, user]);
 
     const handleClicked = (track: Track) => {
         setCurrentTrackFR(track);
@@ -105,15 +114,13 @@ export default function PlaylistInfo(props: Props) {
 
     const handleFollow = () => {
         if(followed){
-            const followed = user!.Followed.filter((o) => o.PlaylistID == playlist.PlaylistID);
+            const followed = user!.Follows.filter((o) => o.PlaylistID == playlist.PlaylistID);
             followed.map((o) => {
                 unfollow(o.FollowedID);
             })
-            setFollowed(false);
         }
         else {
             follow(playlist.PlaylistID, "Playlist");
-            setFollowed(true);
         }
     }
 

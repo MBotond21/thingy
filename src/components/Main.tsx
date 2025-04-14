@@ -1,12 +1,12 @@
 import { useContext, useState } from "react"
 import Top from "./Top";
-import { AuthContext } from "../contexts/AuthContext";
-import { TrackContext } from "../contexts/MusicContext";
+import { ApiContext } from "../contexts/ApiContext";
+import { MusicContext } from "../contexts/MusicContext";
 
 export default function Main() {
 
-    const { user } = useContext(AuthContext);
-    const { active, currentTrack } = useContext(TrackContext)
+    const { user } = useContext(ApiContext);
+    const { active, currentTrack } = useContext(MusicContext)
 
 
     return <>

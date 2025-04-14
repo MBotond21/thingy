@@ -1,13 +1,13 @@
 import { faCirclePlay, faMusic, faInfo } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext } from "react";
-import { TrackContext } from "../contexts/MusicContext";
-import { AuthContext } from "../contexts/AuthContext";
+import { MusicContext } from "../contexts/MusicContext";
+import { ApiContext } from "../contexts/ApiContext";
 
 export default function PhoneNav() {
 
-    const { active, setActive, currentTrack } = useContext(TrackContext);
-    const { user } = useContext(AuthContext);
+    const { active, setActive, currentTrack } = useContext(MusicContext);
+    const { user } = useContext(ApiContext);
 
     const needForPlaylistBtn = (user? true: false);
     const needForTrackBtn = (currentTrack? true: false);
