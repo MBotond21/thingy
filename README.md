@@ -1,3 +1,20 @@
+## Project setup
+
+Run the following command in a terminal
+```bash
+$ npm install
+```
+
+## Compile and run the project
+
+```bash
+# development
+$ npm run dev
+
+# build for production
+$ npm run build
+```
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
