@@ -16,10 +16,10 @@
 
 ## 🛠️ Tech Stack
 
-- [React](https://reactjs.org/)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Vite](https://vitejs.dev/)
+- <a href="https://reactjs.org/" target="_blank" rel="noopener noreferrer">React</a>
+- <a href="https://www.typescriptlang.org/" target="_blank" rel="noopener noreferrer">TypeScript</a>
+- <a href="https://tailwindcss.com/" target="_blank" rel="noopener noreferrer">Tailwind CSS</a>
+- <a href="https://vitejs.dev/" target="_blank" rel="noopener noreferrer">Vite</a>
 
 ---
 
@@ -27,7 +27,7 @@
 
 ### Prerequisites
 
-1. Clone/download the [Backend Repository](https://github.com/BroGamesJaj/BackThingy) and follow its README for setup.
+1. Clone/download the <a href="https://github.com/BroGamesJaj/BackThingy" target="_blank" rel="noopener noreferrer">Backend Repository</a> and follow its README for setup.
 2. Ensure the backend runs on `http://localhost:3000`.
 3. Internet connection is required for third-party music API access.
 
@@ -71,7 +71,7 @@ npm run preview
 
 - Uses Fetch to interact with the backend at http://localhost:3000.
 
-- Also uses Fetch to interact with a third-party API: <a href="https://developer.jamendo.com/v3.0/docs">Jamendo</a>
+- Also uses Fetch to interact with a third-party API: <a href="https://developer.jamendo.com/v3.0/docs" target="_blank" rel="noopener noreferrer">Jamendo</a>
 
 - Backend handles auth, playlists, and search functions.
 
@@ -83,4 +83,4 @@ npm run preview
 ---
 
 ## 👤 Author
-- <a href="https://github.com/MBotond21">Mészáros Botond</a>
+- <a href="https://github.com/MBotond21" target="_blank" rel="noopener noreferrer">Mészáros Botond</a>
