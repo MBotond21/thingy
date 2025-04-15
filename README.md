@@ -66,5 +66,7 @@ src/
 
 - Backend handles auth, playlists, and search functions.
 
+---
+
 ## 👤 Author
 - <a href="https://github.com/MBotond21">Mészáros Botond</a>
