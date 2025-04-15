@@ -34,6 +34,12 @@
 ### Installation
 
 ```bash
+npm install
+```
+
+### Running app
+
+```bash
 # Start the dev server
 npm run dev
 
