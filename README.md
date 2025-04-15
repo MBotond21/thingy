@@ -51,11 +51,12 @@ npm run preview
 ### Project structure
 
 ```bash
-src/
-├── assets/          # Static files
-├── components/      # Reusable components
-├── contexts/        # Global state management
-├── pages/           # Route-level components
+├── public/      # Publicly availabe images stored
+├── src/         # Source files and folders
+    ├── assets/          # Static files
+    ├── components/      # Reusable components
+    ├── contexts/        # Global state management
+    ├── pages/           # Route-level components
 ```
 
 ---
@@ -64,7 +65,14 @@ src/
 
 - Uses Fetch to interact with the backend at http://localhost:3000.
 
+- Also uses Fetch to interact with a third-party API: <a href="https://developer.jamendo.com/v3.0/docs">Jamendo</a>
+
 - Backend handles auth, playlists, and search functions.
+
+- Sourced from the third-party API:
+    - Tracks
+    - Albums
+    - Artists
 
 ---
 
