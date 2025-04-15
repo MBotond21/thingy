@@ -84,7 +84,7 @@ npm run preview
 
 ### Testing
 
-- This project has manual tests, for which pleas refer to the <a href="https://github.com/MBotond21/thingy/wiki/Manual-Testing-Documentation">Testing Doc</a> under the Wiki section
+- This project has manual tests, for which please refer to the <a href="https://github.com/MBotond21/thingy/wiki/Manual-Testing-Documentation">Testing Doc</a> under the Wiki section
 - You can copy the markdown if you whish to expand or retest
 
 ## 👤 Author
