@@ -54,7 +54,7 @@ npm run preview
 src/
 ├── assets/          # Static files
 ├── components/      # Reusable components
-├── contexts/        # contexts
+├── contexts/        # Global state management
 ├── pages/           # Route-level components
 ```
 
@@ -66,7 +66,5 @@ src/
 
 - Backend handles auth, playlists, and search functions.
 
-## 👥 Authors / Contributors
-
-- Pásztor Botond
-- Mészáros Botond
+## 👤 Author
+- <a href="https://github.com/MBotond21">Mészáros Botond</a>
