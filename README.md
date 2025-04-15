@@ -1,6 +1,6 @@
 # Thingy
 
-**Thingy** is a user experience–driven music player with a customizable UI to make your listening experience unique and comfortable.
+**Thingy** is a user experience–driven music player with a customizable UI to make your listening experience unique and comfortable, all made available in a web application.
 
 ---
 
