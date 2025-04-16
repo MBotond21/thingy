@@ -33,7 +33,7 @@ interface MusicContextState {
     searchTracks: (term: string) => Promise<Track[]>;
     searchAlbums: (term: string) => Promise<Album[]>;
     searchArtists: (term: string) => Promise<Artist[]>;
-    resolveFollowItem: (item: Followed) => Promise<{name: string, image: string, owner: string} | null>;
+    resolveFollowItem: (item: Followed) => Promise<{ name: string, image: string, owner: string } | null>;
 }
 
 interface CacheEntry<T> {
@@ -116,7 +116,7 @@ export const MusicContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
             let pc = null;
 
-            if(data.PlaylistCover) {
+            if (data.PlaylistCover) {
                 pc = URL.createObjectURL(new Blob([new Uint8Array(data.PlaylistCover.data)], { type: "image/png" }));
             } else {
                 pc = '/playlist_cover.png';
@@ -133,13 +133,29 @@ export const MusicContextProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     useEffect(() => {
         if (!currentTrack) setActive('info');
+        const stored = localStorage.getItem('currentTrack');
+        if (stored) {
+            try {
+                setCurrentTrack(JSON.parse(stored));
+            } catch (err) {
+                console.error('Failed to parse currentTrack from localStorage', err);
+            }
+        }
     }, []);
+
+    useEffect(() => {
+        if (currentTrack) {
+            localStorage.setItem('currentTrack', JSON.stringify(currentTrack));
+        } else {
+            localStorage.removeItem('currentTrack');
+        }
+    }, [currentTrack]);
 
     const resolveFollowItem = async (item: Followed): Promise<resolvedItem | null> => {
         const fetcher = fetchers[item.Type];
         if (!fetcher) return null;
-        return await fetcher((item.PlaylistID? item.PlaylistID!.toString(): item.TypeID!.toString()));
-      };
+        return await fetcher((item.PlaylistID ? item.PlaylistID!.toString() : item.TypeID!.toString()));
+    };
 
     const toReadable = (text: string) => {
         const parser = new DOMParser();

@@ -58,8 +58,8 @@ function App() {
           )
         }
         {
-          user?.Follows.map((follow, index) => (
-            <FollowPrev key={index} follow={follow}/>
+          user?.Follows.map((follow) => (
+            <FollowPrev key={follow.FollowedID} follow={follow}/>
           ))
         }
         <button className="flex-shrink-0 hover:bg-gray28 p-2 transition-all rounded-md flex items-center justify-center text-xl md:text-base mb-6 lg:mb-0 mt-8" onClick={() => setIsCreating(true)}>

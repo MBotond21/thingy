@@ -50,9 +50,9 @@ export const ApiContext = createContext<ApiContextState>({
     autoComplete: undefined,
     setAutoComplete: () => { },
     searchPlaylists: async () => [],
-    follow: async () => {},
-    unfollow: async () => {},
-    deletePlaylist: async () => {},
+    follow: async () => { },
+    unfollow: async () => { },
+    deletePlaylist: async () => { },
 });
 
 export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -263,7 +263,7 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             if (update.PlaylistName) f.append("PlaylistName", update.PlaylistName);
             if (update.Description) f.append("Description", update.Description);
             if (update.PlaylistCover) f.append("PlaylistCover", update.PlaylistCover);
-            if (update.Private !== undefined) f.append("Private", update.Private.toString());     
+            if (update.Private !== undefined) f.append("Private", update.Private.toString());
 
             const response = await fetch(`http://localhost:3000/playlists/${PlaylistId}`, {
                 method: 'PATCH',
@@ -453,7 +453,7 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const follow = async (FollowedID: number, Type: string) => {
         console.log("following");
-    
+
         try {
             const response = await fetch(`http://localhost:3000/followed`, {
                 method: 'POST',
@@ -463,14 +463,14 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 },
                 body: JSON.stringify({ FollowedID, Type }),
             });
-    
+
             if (!response.ok) {
                 const e = await response.json();
                 throw new Error(e.message);
             }
-    
+
             const data = await response.json();
-    
+
             setUser(prevUser => {
                 if (prevUser) {
                     return {
@@ -480,15 +480,15 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 }
                 return prevUser;
             });
-    
+
         } catch (e: any) {
             console.log(e.message);
         }
-    };    
+    };
 
     const unfollow = async (FollowedID: number) => {
         console.log("unfollowing");
-        
+
         try {
             const response = await fetch(`http://localhost:3000/followed/${FollowedID}`, {
                 method: 'DELETE',
@@ -501,16 +501,8 @@ export const ApiProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 const e = await response.json();
                 throw new Error(e.message);
             }
-
-            setUser(prevUser => {
-                if (prevUser) {
-                  return {
-                    ...prevUser,
-                    Follows: prevUser.Follows.filter((o) => o.FollowedID != FollowedID),
-                  };
-                }
-                return prevUser;
-              });              
+            
+            profile();
 
         } catch (e: any) {
             console.log(e.message);
